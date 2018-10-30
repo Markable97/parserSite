@@ -27,7 +27,32 @@ public class ParserSite {
         Document doc = Jsoup.connect(url).get();
         Element allListPlayerHtml = doc.select("div.cont.all_news").last();
         Elements infoPlayer = allListPlayerHtml.getElementsByClass("dark_blue_block");
+        String name = null, team = null, amplua = null, birthdate = null, number = null;
+        int k = 0;
         for(Element aboutPlayer : infoPlayer){
+            Elements playerTitle = aboutPlayer.select("div.player_title > p");
+            System.out.println("Размер = " + playerTitle.outerHtml() + "коней!!!!!!!!!");
+            for(Element p : playerTitle){
+                switch(k){
+                    case 0:
+                        name = p.text();
+                        break;                      
+                    case 1:
+                        team = p.text();
+                        break;                      
+                    case 2:
+                        amplua = p.text();
+                        break;                      
+                    case 4:
+                        birthdate = p.text();
+                        break;                       
+                    case 5:
+                        number = p.text();
+                        break;                      
+                }
+                k++;
+            }
+            System.out.println(name + team + amplua + birthdate + number);
             
         }
         System.out.println("size listPlayet = " + infoPlayer.size());
