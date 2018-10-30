@@ -16,7 +16,7 @@ public class ParserSite {
      */
     public static void main(String[] args) {
         //комментария для Git
-        System.out.println("Hollo world");
+        System.out.println("Привет мир");
     }
     
 }
