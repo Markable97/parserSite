@@ -15,6 +15,7 @@ public class ParserSite {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        //комментария для Git
         System.out.println("Hollo world");
     }
     
