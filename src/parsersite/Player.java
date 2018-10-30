@@ -24,6 +24,31 @@ public class Player {
         this.birthday = birthday;
         this.number = number;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getTeam() {
+        return team;
+    }
+
+    public String getAmplua() {
+        return amplua;
+    }
+
+    public String getBirthday() {
+        return birthday;
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    @Override
+    public String toString() {
+        return "Player{" + "name=" + name + ", team=" + team + ", amplua=" + amplua + ", birthday=" + birthday + ", number=" + number + "}\n";
+    }
     
     
     
