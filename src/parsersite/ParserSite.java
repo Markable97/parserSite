@@ -38,7 +38,7 @@ public class ParserSite {
             for(Element p : playerTitle){
                 switch(k){
                     case 0:
-                        name = p.text();
+                        name = replaceName(p.text());
                         break;                      
                     case 1:
                         team =replaceNameTeam( p.text().replace("Текущий клуб: ", "") );
@@ -62,6 +62,7 @@ public class ParserSite {
         }
         System.out.println("size listPlayet = " + listPlayer.size());
         System.out.println(listPlayer.toString());
+        DataBaseQuery baseQuery = new DataBaseQuery(listPlayer);
         
     }
     
@@ -75,6 +76,13 @@ public class ParserSite {
             return str;
         }
         
+    }
+    
+    static String replaceName(String str){
+        String main = "";
+        String[] ch = str.split(" ");
+        main = ch[0] + " " + ch[1];
+        return main;
     }
     
     static String replaceDateFormat(String str){
