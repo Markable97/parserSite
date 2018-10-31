@@ -21,7 +21,7 @@ public class DataBaseQuery {
     
     private static String user = "root";
     private static String password = "7913194";
-    private static String url = "jdbc:mysql://localhost:3306/footbal_database";
+    private static String url = "jdbc:mysql://localhost:3306/main_football";
     
     private static PreparedStatement insertPlayer;
     
