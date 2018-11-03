@@ -35,7 +35,23 @@ public class ParserSite {
             String url = e.attr("abs:href");
             urlList.add(url);
         }
-        System.out.println("Кол-во ссылок = " + urlList.size());
+        System.out.println("Кол-во ссылок = " + urlList.toString());
+        //parsingPlayerStatistic(urlList);
+        
+    
+
+    }
+    
+    static void parsingPlayerStatistic(ArrayList<String> list) throws IOException{
+        
+            Document doc = Jsoup.connect(list.get(0)).get();
+            Element divTable = doc.getElementById("team_list_tab_slide_0");
+            Elements t = divTable.getElementsByTag("div");
+            System.out.print(t.size());
+        
+    }
+    
+    void parsingPlayerInfo() throws IOException{
         for(String url : urlList){
             Document doc = Jsoup.connect(url+"/players_list").get();
             Element allListPlayerHtml = doc.select("div.cont.all_news").last();
@@ -69,15 +85,13 @@ public class ParserSite {
                 }
                 k=0;
                 listPlayer.add(new Player(name, team, amplua, birthdate, number));
-
-            }
+        
+             }
             System.out.println("size listPlayet = " + listPlayer.size());
             System.out.println(listPlayer.toString());
             DataBaseQuery baseQuery = new DataBaseQuery(listPlayer);
             listPlayer.clear();
             }
-        
-        
     }
     
     static String replaceNameTeam(String str){
