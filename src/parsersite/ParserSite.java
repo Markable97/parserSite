@@ -28,7 +28,8 @@ public class ParserSite {
      */
     public static void main(String[] args) throws IOException {
         System.out.println("Начало парсинга");
-        Document docTournament = Jsoup.connect(urlDiva).get();
+        parsingPlayerInMatch();
+        /*Document docTournament = Jsoup.connect(urlDiva).get();
         Element teamTable = docTournament.getElementById("table_tab_slide_0");
         Elements teamUrls = teamTable.select("td.left_align_table > a");
         for(Element e : teamUrls){
@@ -36,10 +37,69 @@ public class ParserSite {
             urlList.add(url);
         }
         System.out.println("Кол-во ссылок = " + urlList.toString());
-        parsingPlayerInfo(urlList);
+        parsingPlayerInfo(urlList);*/
         
     
 
+    }
+    
+    static void parsingPlayerInMatch() throws IOException{
+        String nameHome, nameGuest;
+        int goalHome, goalGuest;
+        Document doc = Jsoup.connect(urlDiva+"/tour6?").get();
+        Elements divs = doc.select("div.some_news");
+        for(Element div : divs){
+            Elements head = div.select("div.match_head");
+            Elements spans = head.select("span");
+            //System.out.println(span.text());
+            if(!spans.get(2).text().equals("Дата и время: - -")){
+                Elements divLeft = div.select("div.match_left");
+                nameHome = divLeft.select("div.match_team.match_team_home > p.match_team_name").text();
+                nameGuest = divLeft.select("div.match_team.match_team_away > p.match_team_name").text();
+                Elements score = divLeft.select("div.match_score");
+                goalHome = Integer.parseInt(score.get(0).text());
+                goalGuest = Integer.parseInt(score.get(2).text());
+                System.out.println("\n" + nameHome + " " + goalHome+ ":" + goalGuest + " " + nameGuest );
+                Elements divRight = div.select("div.match_right");
+                Elements members = divRight.select("div.match_members");
+                //Elements spans = members.select("span");
+                Element squadTeam = members.get(1);
+                Elements ps = squadTeam.select("p");
+                if(ps.size() == 10 ){
+                    System.out.println(nameHome);
+                    Element p = ps.get(2);
+                    Elements data = p.select("span");
+                    System.out.println("Основные");
+                    for(Element s : data){
+                        System.out.print(replaceName(s.text()) + " " );
+                    }
+                    p = ps.get(4);
+                    data = p.select("span");
+                    System.out.println("Запасные");
+                    for(Element s : data){
+                        System.out.print( replaceName(s.text()) + " ");
+                    }
+                    System.out.println("\n" + nameGuest);
+                    p = ps.get(7);
+                    data = p.select("span");
+                    System.out.println("Основные");
+                    for(Element s : data){
+                        System.out.print( replaceName(s.text()) + " ");
+                    }
+                    p = ps.get(9);
+                    data = p.select("span");
+                    System.out.println("Запасные");
+                    for(Element s : data){
+                        System.out.print( replaceName(s.text()) + " ");
+                    }
+                }else{
+                    
+                }
+                System.out.println(ps.size());
+            }
+            
+        }
+        System.out.println(divs.size());
     }
     
     static void parsingPlayerStatistic(String url, ArrayList<Player> players) throws IOException{
@@ -159,7 +219,14 @@ public class ParserSite {
         String main = "";
         String[] ch = str.split(" ");
         main = ch[0] + " " + ch[1];
-        return main;
+        String[] ch1 = main.split("\\.");
+        //System.out.println(ch1.length);
+        if(ch1.length > 1){
+            return main = ch1[1];
+        }else{
+            return main;
+        }
+        //return main;
     }
     
     static String replaceDateFormat(String str){
