@@ -46,16 +46,18 @@ public class ParserSite {
     static void parsingPlayerInMatch() throws IOException{
         String nameHome, nameGuest;
         int goalHome, goalGuest;
-        Document doc = Jsoup.connect(urlDiva+"/tour6?").get();
+        Document doc = Jsoup.connect(urlDiva+"/tour7?").get();
         Elements divs = doc.select("div.some_news");
+        ArrayList<Player> playerInMatch = new ArrayList();
         for(Element div : divs){
             Elements head = div.select("div.match_head");
             Elements spans = head.select("span");
             //System.out.println(span.text());
             if(!spans.get(2).text().equals("Дата и время: - -")){
+                //playerInMatch.clear();//пока очистка для вывода
                 Elements divLeft = div.select("div.match_left");
-                nameHome = divLeft.select("div.match_team.match_team_home > p.match_team_name").text();
-                nameGuest = divLeft.select("div.match_team.match_team_away > p.match_team_name").text();
+                nameHome = replaceNameTeam( divLeft.select("div.match_team.match_team_home > p.match_team_name").text() );
+                nameGuest = replaceNameTeam( divLeft.select("div.match_team.match_team_away > p.match_team_name").text() );
                 Elements score = divLeft.select("div.match_score");
                 goalHome = Integer.parseInt(score.get(0).text());
                 goalGuest = Integer.parseInt(score.get(2).text());
@@ -71,34 +73,40 @@ public class ParserSite {
                     Elements data = p.select("span");
                     System.out.println("Основные");
                     for(Element s : data){
-                        System.out.print(replaceName(s.text()) + " " );
+                        //System.out.print(replaceName(s.text()) + " " );
+                        playerInMatch.add(new Player(nameHome, replaceName(s.text())));
                     }
                     p = ps.get(4);
                     data = p.select("span");
                     System.out.println("Запасные");
                     for(Element s : data){
-                        System.out.print( replaceName(s.text()) + " ");
+                        //System.out.print( replaceName(s.text()) + " ");
+                        playerInMatch.add(new Player(nameHome, replaceName(s.text())));
                     }
                     System.out.println("\n" + nameGuest);
                     p = ps.get(7);
                     data = p.select("span");
                     System.out.println("Основные");
                     for(Element s : data){
-                        System.out.print( replaceName(s.text()) + " ");
+                        //System.out.print( replaceName(s.text()) + " ");
+                        playerInMatch.add(new Player(nameGuest, replaceName(s.text())));
                     }
                     p = ps.get(9);
                     data = p.select("span");
                     System.out.println("Запасные");
                     for(Element s : data){
-                        System.out.print( replaceName(s.text()) + " ");
+                        //System.out.print( replaceName(s.text()) + " ");
+                        playerInMatch.add(new Player(nameGuest, replaceName(s.text())));
                     }
                 }else{
-                    
+                    //если кол-во спан другое, то порядок записей другой
                 }
                 System.out.println(ps.size());
+                Element goalAndAssist = members.get(0);
             }
             
         }
+        System.out.println(playerInMatch.toString());
         System.out.println(divs.size());
     }
     

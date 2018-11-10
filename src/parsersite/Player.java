@@ -22,6 +22,11 @@ public class Player {
     int yellow;
     int red;
 
+    public Player(String team, String name){
+        this.team = team;
+        this.name = name;
+    }
+    
     public Player(String name, String team, String amplua, String birthday, int number) {
         this.name = name;
         this.team = team;
