@@ -49,11 +49,14 @@ public class ParserSite {
         Document doc = Jsoup.connect(urlDiva+"/tour7?").get();
         Elements divs = doc.select("div.some_news");
         ArrayList<Player> playerInMatch = new ArrayList();
+        ArrayList <Player> plOneMatch = new ArrayList<>();
         for(Element div : divs){
             Elements head = div.select("div.match_head");
             Elements spans = head.select("span");
             //System.out.println(span.text());
+            plOneMatch.clear();//очистка после каждого прохода
             if(!spans.get(2).text().equals("Дата и время: - -")){
+                
                 //playerInMatch.clear();//пока очистка для вывода
                 Elements divLeft = div.select("div.match_left");
                 nameHome = replaceNameTeam( divLeft.select("div.match_team.match_team_home > p.match_team_name").text() );
@@ -66,7 +69,7 @@ public class ParserSite {
                 Elements members = divRight.select("div.match_members");
                 //Elements spans = members.select("span");
                 Element squadTeam = members.get(1);
-                Elements ps = squadTeam.select("p");
+                Elements ps = squadTeam.select("p");//захват тега <p>
                 if(ps.size() == 10 ){
                     System.out.println(nameHome);
                     Element p = ps.get(2);
@@ -74,14 +77,14 @@ public class ParserSite {
                     System.out.println("Основные");
                     for(Element s : data){
                         //System.out.print(replaceName(s.text()) + " " );
-                        playerInMatch.add(new Player(nameHome, replaceName(s.text())));
+                        plOneMatch.add(new Player(nameHome, replaceName(s.text())));
                     }
                     p = ps.get(4);
                     data = p.select("span");
                     System.out.println("Запасные");
                     for(Element s : data){
                         //System.out.print( replaceName(s.text()) + " ");
-                        playerInMatch.add(new Player(nameHome, replaceName(s.text())));
+                        plOneMatch.add(new Player(nameHome, replaceName(s.text())));
                     }
                     System.out.println("\n" + nameGuest);
                     p = ps.get(7);
@@ -89,22 +92,56 @@ public class ParserSite {
                     System.out.println("Основные");
                     for(Element s : data){
                         //System.out.print( replaceName(s.text()) + " ");
-                        playerInMatch.add(new Player(nameGuest, replaceName(s.text())));
+                        plOneMatch.add(new Player(nameGuest, replaceName(s.text())));
                     }
                     p = ps.get(9);
                     data = p.select("span");
                     System.out.println("Запасные");
                     for(Element s : data){
                         //System.out.print( replaceName(s.text()) + " ");
-                        playerInMatch.add(new Player(nameGuest, replaceName(s.text())));
+                       plOneMatch.add(new Player(nameGuest, replaceName(s.text())));
                     }
                 }else{
                     //если кол-во спан другое, то порядок записей другой
                 }
                 System.out.println(ps.size());
                 Element goalAndAssist = members.get(0);
+                ps = goalAndAssist.select("p");
+                for(Element p : ps){
+                    Elements urls = p.select("a");
+                    System.out.println(urls.text());
+                    if (urls.size() == 1){//без ассистентов
+                       for(int i = 0; i < plOneMatch.size(); i++){
+                           if(urls.text().equals(plOneMatch.get(i).getName())){//совпадении имени
+                               int goal = plOneMatch.get(i).getGoal();
+                               //System.out.println(urls.text() + "Голов было = " + go);
+                               plOneMatch.get(i).setGoal(++goal);
+                           }
+                       }
+                    }else{//с ассистом
+                        String[] ch = urls.text().split(" ");
+                        String playerGoal = ch[0] + " " + ch[1];
+                        String str = ch[2] + " " + ch[3];
+                        String playerAssist = str.replace(")", "");
+                        System.out.println("goal = " + playerGoal + " Assist = " + playerAssist);
+                        for(int i = 0; i < plOneMatch.size(); i++){
+                           if(playerGoal.equals(plOneMatch.get(i).getName())){//совпадении имени
+                               int goal = plOneMatch.get(i).getGoal();
+                               //System.out.println(urls.text() + "Голов было = " + go);
+                               plOneMatch.get(i).setGoal(++goal);
+                           }
+                           if(playerAssist.equals(plOneMatch.get(i).getName())){//совпадении имени
+                               int assist = plOneMatch.get(i).getAssist();
+                               //System.out.println(urls.text() + "Голов было = " + go);
+                               plOneMatch.get(i).setGoal(++assist);
+                           }
+                       }
+                    }
+                }
             }
-            
+            for(int i = 0; i < plOneMatch.size(); i++){
+                playerInMatch.add(plOneMatch.get(i));
+            }
         }
         System.out.println(playerInMatch.toString());
         System.out.println(divs.size());
@@ -229,11 +266,15 @@ public class ParserSite {
         main = ch[0] + " " + ch[1];
         String[] ch1 = main.split("\\.");
         //System.out.println(ch1.length);
-        if(ch1.length > 1){
+        if(ch1.length > 1){ //если есть в имени точка то возвращаем 1 член
             return main = ch1[1];
-        }else{
-            return main;
         }
+        String[] ch2 = main.split("\\)");//если есть скобочка после имени то возвразаем 0 член
+        if(ch2.length>1){
+            return main = ch2[0];
+        }
+        
+        return main;
         //return main;
     }
     
