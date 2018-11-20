@@ -46,7 +46,7 @@ public class ParserSite {
     static void parsingPlayerInMatch() throws IOException{
         String nameHome, nameGuest;
         int goalHome, goalGuest;
-        Document doc = Jsoup.connect(urlDiva+"/tour7?").get();
+        Document doc = Jsoup.connect(urlDiva+"/tour1?").get();
         Elements divs = doc.select("div.some_news");
         ArrayList<Player> playerInMatch = new ArrayList();
         ArrayList <Player> plOneMatch = new ArrayList<>();
@@ -110,6 +110,7 @@ public class ParserSite {
                 for(Element p : ps){
                     Elements urls = p.select("a");
                     System.out.println(urls.text());
+                    String s = urls.text();
                     if (urls.size() == 1){//без ассистентов
                        for(int i = 0; i < plOneMatch.size(); i++){
                            if(urls.text().equals(plOneMatch.get(i).getName())){//совпадении имени
@@ -133,9 +134,36 @@ public class ParserSite {
                            if(playerAssist.equals(plOneMatch.get(i).getName())){//совпадении имени
                                int assist = plOneMatch.get(i).getAssist();
                                //System.out.println(urls.text() + "Голов было = " + go);
-                               plOneMatch.get(i).setGoal(++assist);
+                               plOneMatch.get(i).setAssist(++assist);
                            }
                        }
+                    }  
+                }
+                int sizeMember = members.size();
+                if(sizeMember > 2 && sizeMember < 4){
+                    //Если есть предупреждения или пенальти
+                    Element action = members.get(2);
+                    Elements spanAction = action.select("span");
+                    for(Element span : spanAction){
+                        Element link = span.select("a").first();
+                        String playerName = replaceName(link.text());
+                        String nameImage = link.select("img").attr("src");
+                        if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
+                            //Если желтая карточка
+                            for(int i = 0; i < plOneMatch.size(); i++){
+                                if(playerName.equals(plOneMatch.get(i).getName())){
+                                    int yellow = plOneMatch.get(i).getYellow();
+                                    plOneMatch.get(i).setYellow(++yellow);
+                                }
+                            }
+                        }else if(nameImage.equals("/theme/img/popup_rc.png")){
+                            for(int i = 0; i < plOneMatch.size(); i++){
+                                if(playerName.equals(plOneMatch.get(i).getName())){
+                                    int red = plOneMatch.get(i).getRed();
+                                    plOneMatch.get(i).setRed(++red);
+                                }
+                            }
+                        }
                     }
                 }
             }
