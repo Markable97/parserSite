@@ -12,10 +12,15 @@ import java.util.ArrayList;
  * @author Markable
  */
 public class Match {
+    String division;
+    int tour;
+    String dateMatch;
     String teamHome;
     int goalHome;
     int goalGuest;
     String teamGuest;
     ArrayList<Player> players;
+    String stadium;
+    String referee;
     
 }

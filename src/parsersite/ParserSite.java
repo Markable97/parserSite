@@ -44,10 +44,11 @@ public class ParserSite {
     }
     
     static void parsingPlayerInMatch() throws IOException{
-        String nameHome, nameGuest;
+        String nameHome, nameGuest, dateMatch, referee, stadium, division;
         int goalHome, goalGuest;
-        Document doc = Jsoup.connect(urlDiva+"/tour1?").get();
+        Document doc = Jsoup.connect(urlDiva+"/tour8?").get();
         Elements divs = doc.select("div.some_news");
+        ArrayList<Match> martches = new ArrayList<>(); //список матчей
         ArrayList<Player> playerInMatch = new ArrayList();
         ArrayList <Player> plOneMatch = new ArrayList<>();
         for(Element div : divs){
@@ -56,8 +57,28 @@ public class ParserSite {
             //System.out.println(span.text());
             plOneMatch.clear();//очистка после каждого прохода
             if(!spans.get(2).text().equals("Дата и время: - -")){
-                
+               
+                //инфо о матче (дивизион, дата, поле, судья)
+                for(int i = 0; i < spans.size(); i++){
+                    Element e = spans.get(i);
+                    switch(i){
+                        case 0: 
+                            division = replaceNameDivision(e.text());
+                            break;
+                        case 1:
+                            break;
+                        case 2:
+                            break;
+                        case 3:
+                            break;
+                        case 4:
+                            break;
+                        case 5:
+                            break;
+                    }
+                }
                 //playerInMatch.clear();//пока очистка для вывода
+                //инфо о матче (кто играет, какой счет)
                 Elements divLeft = div.select("div.match_left");
                 nameHome = replaceNameTeam( divLeft.select("div.match_team.match_team_home > p.match_team_name").text() );
                 nameGuest = replaceNameTeam( divLeft.select("div.match_team.match_team_away > p.match_team_name").text() );
@@ -65,6 +86,7 @@ public class ParserSite {
                 goalHome = Integer.parseInt(score.get(0).text());
                 goalGuest = Integer.parseInt(score.get(2).text());
                 System.out.println("\n" + nameHome + " " + goalHome+ ":" + goalGuest + " " + nameGuest );
+                //информация о игроках(состав, действия в матче)
                 Elements divRight = div.select("div.match_right");
                 Elements members = divRight.select("div.match_members");
                 //Elements spans = members.select("span");
@@ -171,7 +193,7 @@ public class ParserSite {
                 playerInMatch.add(plOneMatch.get(i));
             }
         }
-        System.out.println(playerInMatch.toString());
+        //System.out.println(playerInMatch.toString());
         System.out.println(divs.size());
     }
     
@@ -319,5 +341,10 @@ public class ParserSite {
         }
         System.out.println(mainStr);
         return mainStr;
+    }
+
+    static String replaceNameDivision(String str){
+        String[] ch = str.split(" ");
+        return ch[0] + " " + ch[1];
     }
 }
