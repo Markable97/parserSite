@@ -44,8 +44,8 @@ public class ParserSite {
     }
     
     static void parsingPlayerInMatch() throws IOException{
-        String nameHome, nameGuest, dateMatch, referee, stadium, division;
-        int goalHome, goalGuest;
+        String nameHome, nameGuest, dateMatch = "", referee = "", stadium = "", division = "";
+        int goalHome, goalGuest, tour = 0;
         Document doc = Jsoup.connect(urlDiva+"/tour8?").get();
         Elements divs = doc.select("div.some_news");
         ArrayList<Match> martches = new ArrayList<>(); //список матчей
@@ -66,17 +66,23 @@ public class ParserSite {
                             division = replaceNameDivision(e.text());
                             break;
                         case 1:
+                            tour = Integer.parseInt(e.text());
                             break;
                         case 2:
+                            dateMatch = replaceDateMatch(e.text());
                             break;
                         case 3:
+                            stadium = e.text().replace("Стадион: ","");
                             break;
                         case 4:
+                            referee = e.text().replace("Судья: ","");
                             break;
                         case 5:
+                            //для вытаскивания ссылок на медиа
                             break;
                     }
                 }
+                System.out.println("Инфо про матч\n" + division + " " + tour + " " + dateMatch + " " + stadium + " " + referee);
                 //playerInMatch.clear();//пока очистка для вывода
                 //инфо о матче (кто играет, какой счет)
                 Elements divLeft = div.select("div.match_left");
@@ -343,6 +349,23 @@ public class ParserSite {
         return mainStr;
     }
 
+    static String replaceDateMatch(String str){
+        String mainStr = str.replace("Дата и время: ", "");
+        String[] lines = mainStr.split(" ");
+        String[] date = lines[0].split("\\.");
+        String time = lines[1];
+        String endStr = "";
+        for(int i = date.length - 1; i >= 0; i--){
+            if(i==0){
+                endStr+=date[i];
+            }else
+                endStr+=date[i]+'-';
+        }
+        System.out.println(endStr + time);
+        return endStr + time;
+    }
+    
+    
     static String replaceNameDivision(String str){
         String[] ch = str.split(" ");
         return ch[0] + " " + ch[1];
