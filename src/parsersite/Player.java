@@ -21,6 +21,9 @@ public class Player {
     int assist;
     int yellow;
     int red;
+    int penalty;
+    int penaltyOut;
+    int ownGoal;
 
     public Player(String team, String name){
         this.team = team;
@@ -77,6 +80,30 @@ public class Player {
         return red;
     }
 
+    public void setPenalty(int penalty) {
+        this.penalty = penalty;
+    }
+
+    public void setPenaltyOut(int penaltyOut) {
+        this.penaltyOut = penaltyOut;
+    }
+
+    public void setOwnGoal(int ownGoal) {
+        this.ownGoal = ownGoal;
+    }
+
+    public int getPenalty() {
+        return penalty;
+    }
+
+    public int getPenaltyOut() {
+        return penaltyOut;
+    }
+
+    public int getOwnGoal() {
+        return ownGoal;
+    }
+
     
     
     public String getName() {
@@ -101,9 +128,13 @@ public class Player {
 
     @Override
     public String toString() {
-        return "Player{" + "name=" + name + ", team=" + team + ", amplua=" + amplua + ", birthday=" + birthday + ", number=" + number + ", games=" + games + 
-                ", goal=" + goal + ", assist=" + assist + ", yellow=" + yellow + ", red=" + red + '}'+'\n';
+        return "Player{" + "name=" + name + ", team=" + team + ", amplua=" + amplua + 
+                ", birthday=" + birthday + ", number=" + number + ", games=" + games + 
+                ", goal=" + goal + ", assist=" + assist + ", yellow=" + yellow + ", red=" + 
+                red + ", penalty=" + penalty + ", penaltyOut=" + penaltyOut + ", ownGoal=" + ownGoal + "}\n";
     }
+
+    
 
     
    
