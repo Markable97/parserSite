@@ -55,6 +55,10 @@ public class Match {
         //this.players = players;
     }
 
+    public void setMatchTransfer(String matchTransfer) {
+        this.matchTransfer = matchTransfer;
+    }
+ 
     @Override
     public String toString() {
         String pl = null;

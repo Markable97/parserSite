@@ -58,6 +58,7 @@ public class ParserSite {
             //System.out.println(span.text());
             plOneMatch.clear();//очистка после каждого прохода
             if(!spans.get(2).text().equals("Дата и время: - -")){
+                
                 //инфо о матче (дивизион, дата, поле, судья)
                 for(int i = 0; i < spans.size(); i++){
                     Element e = spans.get(i);
@@ -96,116 +97,228 @@ public class ParserSite {
                 matches.add(new Match(division, tour, dateMatch, nameHome, goalHome, goalGuest, nameGuest, stadium, referee));
                 //информация о игроках(состав, действия в матче)
                 Elements divRight = div.select("div.match_right");
-                Elements tags_p = div.select("p.match_right_head");//заголовки (Голы, состав, передупржедния, пенальти )
+                //Element tag_p = div.select("p.match_right_head").first();//заголовки (Переносы, Голы, состав, передупржедния, пенальти )
                 Elements members = divRight.select("div.match_members");
-                //Elements spans = members.select("span");
-                Element squadTeam = members.get(1);
-                Elements ps = squadTeam.select("p");//захват тега <p>
-                if(ps.size() == 10 ){
-                    System.out.println(nameHome);
-                    Element p = ps.get(2);
-                    Elements data = p.select("span");
-                    System.out.println("Основные");
-                    for(Element s : data){
-                        //System.out.print(replaceName(s.text()) + " " );
-                        plOneMatch.add(new Player(nameHome, replaceName(s.text())));
+                boolean f = findMatchWithTransfer(members.get(0).text());//смотрим первый тег и вызращаем true если есть пернос
+                if(f==false){
+                    Element squadTeam = members.get(1);
+                    Elements ps = squadTeam.select("p");//захват тега <p>
+                    if(ps.size() == 10 ){
+                        System.out.println(nameHome);
+                        Element p = ps.get(2);
+                        Elements data = p.select("span");
+                        System.out.println("Основные");
+                        for(Element s : data){
+                            //System.out.print(replaceName(s.text()) + " " );
+                            plOneMatch.add(new Player(nameHome, replaceName(s.text())));
+                        }
+                        p = ps.get(4);
+                        data = p.select("span");
+                        System.out.println("Запасные");
+                        for(Element s : data){
+                            //System.out.print( replaceName(s.text()) + " ");
+                            plOneMatch.add(new Player(nameHome, replaceName(s.text())));
+                        }
+                        System.out.println("\n" + nameGuest);
+                        p = ps.get(7);
+                        data = p.select("span");
+                        System.out.println("Основные");
+                        for(Element s : data){
+                            //System.out.print( replaceName(s.text()) + " ");
+                            plOneMatch.add(new Player(nameGuest, replaceName(s.text())));
+                        }
+                        p = ps.get(9);
+                        data = p.select("span");
+                        System.out.println("Запасные");
+                        for(Element s : data){
+                            //System.out.print( replaceName(s.text()) + " ");
+                           plOneMatch.add(new Player(nameGuest, replaceName(s.text())));
+                        }
+                    }else{
+                        //если кол-во спан другое, то порядок записей другой
                     }
-                    p = ps.get(4);
-                    data = p.select("span");
-                    System.out.println("Запасные");
-                    for(Element s : data){
-                        //System.out.print( replaceName(s.text()) + " ");
-                        plOneMatch.add(new Player(nameHome, replaceName(s.text())));
-                    }
-                    System.out.println("\n" + nameGuest);
-                    p = ps.get(7);
-                    data = p.select("span");
-                    System.out.println("Основные");
-                    for(Element s : data){
-                        //System.out.print( replaceName(s.text()) + " ");
-                        plOneMatch.add(new Player(nameGuest, replaceName(s.text())));
-                    }
-                    p = ps.get(9);
-                    data = p.select("span");
-                    System.out.println("Запасные");
-                    for(Element s : data){
-                        //System.out.print( replaceName(s.text()) + " ");
-                       plOneMatch.add(new Player(nameGuest, replaceName(s.text())));
-                    }
-                }else{
-                    //если кол-во спан другое, то порядок записей другой
-                }
-                System.out.println(ps.size());
-                Element goalAndAssist = members.get(0);
-                ps = goalAndAssist.select("p");
-                for(Element p : ps){
-                    Elements urls = p.select("a");
-                    System.out.println(urls.text());
-                    String s = urls.text();
-                    if (urls.size() == 1){//без ассистентов
-                       for(int i = 0; i < plOneMatch.size(); i++){
-                           if(urls.text().equals(plOneMatch.get(i).getName())){//совпадении имени
-                               int goal = plOneMatch.get(i).getGoal();
-                               //System.out.println(urls.text() + "Голов было = " + go);
-                               plOneMatch.get(i).setGoal(++goal);
+                    System.out.println(ps.size());
+                    Element goalAndAssist = members.get(0);
+                    ps = goalAndAssist.select("p");
+                    for(Element p : ps){
+                        Elements urls = p.select("a");
+                        System.out.println(urls.text());
+                        String s = urls.text();
+                        if (urls.size() == 1){//без ассистентов
+                           for(int i = 0; i < plOneMatch.size(); i++){
+                               if(urls.text().equals(plOneMatch.get(i).getName())){//совпадении имени
+                                   int goal = plOneMatch.get(i).getGoal();
+                                   //System.out.println(urls.text() + "Голов было = " + go);
+                                   plOneMatch.get(i).setGoal(++goal);
+                               }
                            }
-                       }
-                    }else{//с ассистом
-                        String[] ch = urls.text().split(" ");
-                        String playerGoal = ch[0] + " " + ch[1];
-                        String str = ch[2] + " " + ch[3];
-                        String playerAssist = str.replace(")", "");
-                        System.out.println("goal = " + playerGoal + " Assist = " + playerAssist);
-                        for(int i = 0; i < plOneMatch.size(); i++){
-                           if(playerGoal.equals(plOneMatch.get(i).getName())){//совпадении имени
-                               int goal = plOneMatch.get(i).getGoal();
-                               //System.out.println(urls.text() + "Голов было = " + go);
-                               plOneMatch.get(i).setGoal(++goal);
-                           }
-                           if(playerAssist.equals(plOneMatch.get(i).getName())){//совпадении имени
-                               int assist = plOneMatch.get(i).getAssist();
-                               //System.out.println(urls.text() + "Голов было = " + go);
-                               plOneMatch.get(i).setAssist(++assist);
-                           }
-                       }
-                    }  
-                }
-                int sizeMember = members.size();
-                if(sizeMember > 2 && sizeMember < 4){
-                    //Если есть предупреждения или пенальти
-                    Element action = members.get(2);
-                    Elements spanAction = action.select("span");
-                    for(Element span : spanAction){
-                        Element link = span.select("a").first();
-                        String playerName = replaceName(link.text());
-                        String nameImage = link.select("img").attr("src");
-                        if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
-                            //Если желтая карточка
+                        }else{//с ассистом
+                            String[] ch = urls.text().split(" ");
+                            String playerGoal = ch[0] + " " + ch[1];
+                            String str = ch[2] + " " + ch[3];
+                            String playerAssist = str.replace(")", "");
+                            System.out.println("goal = " + playerGoal + " Assist = " + playerAssist);
                             for(int i = 0; i < plOneMatch.size(); i++){
-                                if(playerName.equals(plOneMatch.get(i).getName())){
-                                    int yellow = plOneMatch.get(i).getYellow();
-                                    plOneMatch.get(i).setYellow(++yellow);
+                               if(playerGoal.equals(plOneMatch.get(i).getName())){//совпадении имени
+                                   int goal = plOneMatch.get(i).getGoal();
+                                   //System.out.println(urls.text() + "Голов было = " + go);
+                                   plOneMatch.get(i).setGoal(++goal);
+                               }
+                               if(playerAssist.equals(plOneMatch.get(i).getName())){//совпадении имени
+                                   int assist = plOneMatch.get(i).getAssist();
+                                   //System.out.println(urls.text() + "Голов было = " + go);
+                                   plOneMatch.get(i).setAssist(++assist);
+                               }
+                           }
+                        }  
+                    }
+                    int sizeMember = members.size();
+                    if(sizeMember > 2 && sizeMember < 4){
+                        //Если есть предупреждения или пенальти
+                        Element action = members.get(2);
+                        Elements spanAction = action.select("span");
+                        for(Element span : spanAction){
+                            Element link = span.select("a").first();
+                            String playerName = replaceName(link.text());
+                            String nameImage = link.select("img").attr("src");
+                            if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
+                                //Если желтая карточка
+                                for(int i = 0; i < plOneMatch.size(); i++){
+                                    if(playerName.equals(plOneMatch.get(i).getName())){
+                                        int yellow = plOneMatch.get(i).getYellow();
+                                        plOneMatch.get(i).setYellow(++yellow);
+                                    }
                                 }
-                            }
-                        }else if(nameImage.equals("/theme/img/popup_rc.png")){
-                            for(int i = 0; i < plOneMatch.size(); i++){
-                                if(playerName.equals(plOneMatch.get(i).getName())){
-                                    int red = plOneMatch.get(i).getRed();
-                                    plOneMatch.get(i).setRed(++red);
+                            }else if(nameImage.equals("/theme/img/popup_rc.png")){
+                                for(int i = 0; i < plOneMatch.size(); i++){
+                                    if(playerName.equals(plOneMatch.get(i).getName())){
+                                        int red = plOneMatch.get(i).getRed();
+                                        plOneMatch.get(i).setRed(++red);
+                                    }
                                 }
-                            }
-                        }else{
-                            for(int i = 0; i < plOneMatch.size(); i++){
-                                if(playerName.equals(plOneMatch.get(i).getName())){
-                                    int penaltyOut =  plOneMatch.get(i).getPenaltyOut();
-                                     plOneMatch.get(i).setPenaltyOut(++penaltyOut);
+                            }else{
+                                for(int i = 0; i < plOneMatch.size(); i++){
+                                    if(playerName.equals(plOneMatch.get(i).getName())){
+                                        int penaltyOut =  plOneMatch.get(i).getPenaltyOut();
+                                         plOneMatch.get(i).setPenaltyOut(++penaltyOut);
+                                    }
                                 }
                             }
                         }
                     }
+                    matches.get(numberMatch).setPlayers(plOneMatch);//добавляем к объекту матча, массив игроков
+                    numberMatch++; //увеличить счетчик матча
+                }else{
+                    matches.get(numberMatch).setMatchTransfer(members.get(0).text());
+                    Element squadTeam = members.get(1+1);
+                    Elements ps = squadTeam.select("p");//захват тега <p>
+                    if(ps.size() == 10 ){
+                        System.out.println(nameHome);
+                        Element p = ps.get(2);
+                        Elements data = p.select("span");
+                        System.out.println("Основные");
+                        for(Element s : data){
+                            //System.out.print(replaceName(s.text()) + " " );
+                            plOneMatch.add(new Player(nameHome, replaceName(s.text())));
+                        }
+                        p = ps.get(4);
+                        data = p.select("span");
+                        System.out.println("Запасные");
+                        for(Element s : data){
+                            //System.out.print( replaceName(s.text()) + " ");
+                            plOneMatch.add(new Player(nameHome, replaceName(s.text())));
+                        }
+                        System.out.println("\n" + nameGuest);
+                        p = ps.get(7);
+                        data = p.select("span");
+                        System.out.println("Основные");
+                        for(Element s : data){
+                            //System.out.print( replaceName(s.text()) + " ");
+                            plOneMatch.add(new Player(nameGuest, replaceName(s.text())));
+                        }
+                        p = ps.get(9);
+                        data = p.select("span");
+                        System.out.println("Запасные");
+                        for(Element s : data){
+                            //System.out.print( replaceName(s.text()) + " ");
+                           plOneMatch.add(new Player(nameGuest, replaceName(s.text())));
+                        }
+                    }else{
+                        //если кол-во спан другое, то порядок записей другой
+                    }
+                    System.out.println(ps.size());
+                    Element goalAndAssist = members.get(0+1);
+                    ps = goalAndAssist.select("p");
+                    for(Element p : ps){
+                        Elements urls = p.select("a");
+                        System.out.println(urls.text());
+                        String s = urls.text();
+                        if (urls.size() == 1){//без ассистентов
+                           for(int i = 0; i < plOneMatch.size(); i++){
+                               if(urls.text().equals(plOneMatch.get(i).getName())){//совпадении имени
+                                   int goal = plOneMatch.get(i).getGoal();
+                                   //System.out.println(urls.text() + "Голов было = " + go);
+                                   plOneMatch.get(i).setGoal(++goal);
+                               }
+                           }
+                        }else{//с ассистом
+                            String[] ch = urls.text().split(" ");
+                            String playerGoal = ch[0] + " " + ch[1];
+                            String str = ch[2] + " " + ch[3];
+                            String playerAssist = str.replace(")", "");
+                            System.out.println("goal = " + playerGoal + " Assist = " + playerAssist);
+                            for(int i = 0; i < plOneMatch.size(); i++){
+                               if(playerGoal.equals(plOneMatch.get(i).getName())){//совпадении имени
+                                   int goal = plOneMatch.get(i).getGoal();
+                                   //System.out.println(urls.text() + "Голов было = " + go);
+                                   plOneMatch.get(i).setGoal(++goal);
+                               }
+                               if(playerAssist.equals(plOneMatch.get(i).getName())){//совпадении имени
+                                   int assist = plOneMatch.get(i).getAssist();
+                                   //System.out.println(urls.text() + "Голов было = " + go);
+                                   plOneMatch.get(i).setAssist(++assist);
+                               }
+                           }
+                        }  
+                    }
+                    int sizeMember = members.size();
+                    if(sizeMember > 2+1 && sizeMember < 4+1){
+                        //Если есть предупреждения или пенальти
+                        Element action = members.get(2+1);
+                        Elements spanAction = action.select("span");
+                        for(Element span : spanAction){
+                            Element link = span.select("a").first();
+                            String playerName = replaceName(link.text());
+                            String nameImage = link.select("img").attr("src");
+                            if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
+                                //Если желтая карточка
+                                for(int i = 0; i < plOneMatch.size(); i++){
+                                    if(playerName.equals(plOneMatch.get(i).getName())){
+                                        int yellow = plOneMatch.get(i).getYellow();
+                                        plOneMatch.get(i).setYellow(++yellow);
+                                    }
+                                }
+                            }else if(nameImage.equals("/theme/img/popup_rc.png")){
+                                for(int i = 0; i < plOneMatch.size(); i++){
+                                    if(playerName.equals(plOneMatch.get(i).getName())){
+                                        int red = plOneMatch.get(i).getRed();
+                                        plOneMatch.get(i).setRed(++red);
+                                    }
+                                }
+                            }else{
+                                for(int i = 0; i < plOneMatch.size(); i++){
+                                    if(playerName.equals(plOneMatch.get(i).getName())){
+                                        int penaltyOut =  plOneMatch.get(i).getPenaltyOut();
+                                         plOneMatch.get(i).setPenaltyOut(++penaltyOut);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    matches.get(numberMatch).setPlayers(plOneMatch);//добавляем к объекту матча, массив игроков
+                    numberMatch++; //увеличить счетчик матча
                 }
-                matches.get(numberMatch).setPlayers(plOneMatch);//добавляем к объекту матча, массив игроков
-                numberMatch++; //увеличить счетчик матча
+                //Elements spans = members.select("span");
             }else{
                 //Если перенос и матч не сыграли
                 
@@ -405,6 +518,14 @@ public class ParserSite {
         return endStr + " "+ time;
     }
     
+    static boolean findMatchWithTransfer(String str){
+        String[] mainStr = str.split(" ");
+        if(mainStr[0].equals("Перенос")){
+            return true;
+        }else {
+            return false;
+        }
+    }
     
     static String replaceNameDivision(String str){
         String[] ch = str.split(" ");
