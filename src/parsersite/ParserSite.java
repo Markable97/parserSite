@@ -46,9 +46,10 @@ public class ParserSite {
     static void parsingPlayerInMatch() throws IOException{
         String nameHome, nameGuest, dateMatch = "", referee = "", stadium = "", division = "";
         int goalHome, goalGuest, tour = 0;
+        int numberMatch = 0; 
         Document doc = Jsoup.connect(urlDiva+"/tour8?").get();
         Elements divs = doc.select("div.some_news");
-        ArrayList<Match> martches = new ArrayList<>(); //список матчей
+        ArrayList<Match> matches = new ArrayList<>(); //список матчей
         ArrayList<Player> playerInMatch = new ArrayList();
         ArrayList <Player> plOneMatch = new ArrayList<>();
         for(Element div : divs){
@@ -57,7 +58,6 @@ public class ParserSite {
             //System.out.println(span.text());
             plOneMatch.clear();//очистка после каждого прохода
             if(!spans.get(2).text().equals("Дата и время: - -")){
-               
                 //инфо о матче (дивизион, дата, поле, судья)
                 for(int i = 0; i < spans.size(); i++){
                     Element e = spans.get(i);
@@ -92,6 +92,8 @@ public class ParserSite {
                 goalHome = Integer.parseInt(score.get(0).text());
                 goalGuest = Integer.parseInt(score.get(2).text());
                 System.out.println("\n" + nameHome + " " + goalHome+ ":" + goalGuest + " " + nameGuest );
+                //Добавление данных о матче в ArrayList
+                matches.add(new Match(division, tour, dateMatch, nameHome, goalHome, goalGuest, nameGuest, stadium, referee));
                 //информация о игроках(состав, действия в матче)
                 Elements divRight = div.select("div.match_right");
                 Elements members = divRight.select("div.match_members");
@@ -194,14 +196,24 @@ public class ParserSite {
                         }
                     }
                 }
+                matches.get(numberMatch).setPlayers(plOneMatch);//добавляем к объекту матча, массив игроков
+                numberMatch++; //увеличить счетчик матча
+            }else{
+                //Если перенос и матч не сыграли
+                
             }
-            for(int i = 0; i < plOneMatch.size(); i++){
+            
+             //Подумать а надо ли?
+            /*for(int i = 0; i < plOneMatch.size(); i++){
                 playerInMatch.add(plOneMatch.get(i));
-            }
+            }*/
         }
         //System.out.println(playerInMatch.toString());
         System.out.println(divs.size());
+        System.out.println(matches.toString());
     }
+    
+   // http://lfl.ru/?ajax=1&method=tournament_squads_table&tournament_id=4341&club_id=2668
     
     static void parsingPlayerStatistic(String url, ArrayList<Player> players) throws IOException{
                 Document doc = Jsoup.connect("http://lfl.ru/"
