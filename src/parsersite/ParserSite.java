@@ -82,7 +82,7 @@ public class ParserSite {
                             break;
                     }
                 }
-                System.out.println("Инфо про матч\n" + division + " " + tour + " " + dateMatch + " " + stadium + " " + referee);
+                System.out.println("\nИнфо про матч\n" + division + " " + tour + " " + dateMatch + " " + stadium + " " + referee);
                 //playerInMatch.clear();//пока очистка для вывода
                 //инфо о матче (кто играет, какой счет)
                 Elements divLeft = div.select("div.match_left");
@@ -362,7 +362,7 @@ public class ParserSite {
                 endStr+=date[i]+'-';
         }
         System.out.println(endStr + time);
-        return endStr + time;
+        return endStr + " "+ time;
     }
     
     
