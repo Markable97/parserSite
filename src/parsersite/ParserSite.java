@@ -47,7 +47,7 @@ public class ParserSite {
         String nameHome, nameGuest, dateMatch = "", referee = "", stadium = "", division = "", matchTransfer = "";
         int goalHome, goalGuest, tour = 0;
         int numberMatch = 0; 
-        Document doc = Jsoup.connect(urlDiva+"/tour6?").get();
+        Document doc = Jsoup.connect(urlDiva+"/tour3?").get();
         Elements divs = doc.select("div.some_news");
         ArrayList<Match> matches = new ArrayList<>(); //список матчей
         ArrayList<Player> playerInMatch = new ArrayList();
@@ -96,6 +96,7 @@ public class ParserSite {
                 matches.add(new Match(division, tour, dateMatch, nameHome, goalHome, goalGuest, nameGuest, stadium, referee));
                 //информация о игроках(состав, действия в матче)
                 Elements divRight = div.select("div.match_right");
+                Elements tags_p = div.select("p.match_right_head");//заголовки (Голы, состав, передупржедния, пенальти )
                 Elements members = divRight.select("div.match_members");
                 //Elements spans = members.select("span");
                 Element squadTeam = members.get(1);
@@ -191,6 +192,13 @@ public class ParserSite {
                                 if(playerName.equals(plOneMatch.get(i).getName())){
                                     int red = plOneMatch.get(i).getRed();
                                     plOneMatch.get(i).setRed(++red);
+                                }
+                            }
+                        }else{
+                            for(int i = 0; i < plOneMatch.size(); i++){
+                                if(playerName.equals(plOneMatch.get(i).getName())){
+                                    int penaltyOut =  plOneMatch.get(i).getPenaltyOut();
+                                     plOneMatch.get(i).setPenaltyOut(++penaltyOut);
                                 }
                             }
                         }
