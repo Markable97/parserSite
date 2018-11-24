@@ -44,10 +44,10 @@ public class ParserSite {
     }
     
     static void parsingPlayerInMatch() throws IOException{
-        String nameHome, nameGuest, dateMatch = "", referee = "", stadium = "", division = "";
+        String nameHome, nameGuest, dateMatch = "", referee = "", stadium = "", division = "", matchTransfer = "";
         int goalHome, goalGuest, tour = 0;
         int numberMatch = 0; 
-        Document doc = Jsoup.connect(urlDiva+"/tour8?").get();
+        Document doc = Jsoup.connect(urlDiva+"/tour6?").get();
         Elements divs = doc.select("div.some_news");
         ArrayList<Match> matches = new ArrayList<>(); //список матчей
         ArrayList<Player> playerInMatch = new ArrayList();
@@ -201,8 +201,28 @@ public class ParserSite {
             }else{
                 //Если перенос и матч не сыграли
                 
+                //инфо о матче
+                for(int i = 0; i < spans.size(); i++){
+                    Element e = spans.get(i);
+                    switch(i){
+                        case 0: 
+                            division = replaceNameDivision(e.text());
+                            break;
+                        case 1:
+                            tour = Integer.parseInt(e.text());
+                            break;
+                    }
+                }
+                //инфо о камндах
+                Elements divLeft = div.select("div.match_left");
+                nameHome = replaceNameTeam( divLeft.select("div.match_team.match_team_home > p.match_team_name").text() );
+                nameGuest = replaceNameTeam( divLeft.select("div.match_team.match_team_away > p.match_team_name").text() );
+                matchTransfer = div.select("div.match_right > div.match_members").text();
+                System.out.println("\t\t" +division + " " + tour + " " + nameHome + " " + nameGuest + " " + matchTransfer);
+                matches.add(new Match(division, tour, nameHome, nameGuest, matchTransfer));
+                numberMatch++; //увеличить счетчик матчей
             }
-            
+        
              //Подумать а надо ли?
             /*for(int i = 0; i < plOneMatch.size(); i++){
                 playerInMatch.add(plOneMatch.get(i));
@@ -373,7 +393,7 @@ public class ParserSite {
             }else
                 endStr+=date[i]+'-';
         }
-        System.out.println(endStr + time);
+        //System.out.println(endStr + time);
         return endStr + " "+ time;
     }
     

@@ -57,9 +57,14 @@ public class Match {
 
     @Override
     public String toString() {
+        String pl = null;
+        if (players != null){
+            pl = players.toString();
+        }
+        
         return "Match{" + "division=" + division + ", tour=" + tour + ", dateMatch=" + dateMatch + 
                 ", teamHome=" + teamHome + ", goalHome=" + goalHome + ", goalGuest=" + goalGuest + 
-                ", teamGuest=" + teamGuest + ",\n players=" + players.toString() + ", stadium=" + stadium + 
+                ", teamGuest=" + teamGuest + ",\n players=" + pl + ", stadium=" + stadium + 
                 ", referee=" + referee + ", matchTransfer=" + matchTransfer + "}\n\n";
     }
     
