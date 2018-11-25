@@ -47,7 +47,7 @@ public class ParserSite {
         String nameHome, nameGuest, dateMatch = "", referee = "", stadium = "", division = "", matchTransfer = "";
         int goalHome, goalGuest, tour = 0;
         int numberMatch = 0; 
-        Document doc = Jsoup.connect(urlDiva+"/tour3?").get();
+        Document doc = Jsoup.connect(urlDiva+"/tour1?").get();
         Elements divs = doc.select("div.some_news");
         ArrayList<Match> matches = new ArrayList<>(); //список матчей
         ArrayList<Player> playerInMatch = new ArrayList();
@@ -143,14 +143,24 @@ public class ParserSite {
                     for(Element p : ps){
                         Elements urls = p.select("a");
                         System.out.println(urls.text());
-                        String s = urls.text();
+                        String[] s = p.text().split(" ");
                         if (urls.size() == 1){//без ассистентов
-                           for(int i = 0; i < plOneMatch.size(); i++){
-                               if(urls.text().equals(plOneMatch.get(i).getName())){//совпадении имени
-                                   int goal = plOneMatch.get(i).getGoal();
-                                   //System.out.println(urls.text() + "Голов было = " + go);
-                                   plOneMatch.get(i).setGoal(++goal);
+                           String ch = s[2];
+                           if(ch.equals("(аг)")){ //если приписка автогол
+                               for(int i = 0; i < plOneMatch.size(); i++){
+                                   if( urls.text().equals(plOneMatch.get(i).getName()) ){
+                                       int ownGoal = plOneMatch.get(i).getOwnGoal();
+                                       plOneMatch.get(i).setOwnGoal(++ownGoal);
+                                   }
                                }
+                           }else{
+                               for(int i = 0; i < plOneMatch.size(); i++){
+                                    if(urls.text().equals(plOneMatch.get(i).getName())){//совпадении имени
+                                        int goal = plOneMatch.get(i).getGoal();
+                                        //System.out.println(urls.text() + "Голов было = " + go);
+                                        plOneMatch.get(i).setGoal(++goal);
+                                    }
+                                }
                            }
                         }else{//с ассистом
                             String[] ch = urls.text().split(" ");
@@ -252,14 +262,24 @@ public class ParserSite {
                     for(Element p : ps){
                         Elements urls = p.select("a");
                         System.out.println(urls.text());
-                        String s = urls.text();
+                        String[] s = p.text().split(" ");
                         if (urls.size() == 1){//без ассистентов
-                           for(int i = 0; i < plOneMatch.size(); i++){
-                               if(urls.text().equals(plOneMatch.get(i).getName())){//совпадении имени
-                                   int goal = plOneMatch.get(i).getGoal();
-                                   //System.out.println(urls.text() + "Голов было = " + go);
-                                   plOneMatch.get(i).setGoal(++goal);
+                           String ch = s[3];
+                           if(ch.equals("(аг)")){ //если приписка автогол
+                               for(int i = 0; i < plOneMatch.size(); i++){
+                                   if( urls.text().equals(plOneMatch.get(i).getName()) ){
+                                       int ownGoal = plOneMatch.get(i).getOwnGoal();
+                                       plOneMatch.get(i).setOwnGoal(++ownGoal);
+                                   }
                                }
+                           }else{
+                               for(int i = 0; i < plOneMatch.size(); i++){
+                                    if(urls.text().equals(plOneMatch.get(i).getName())){//совпадении имени
+                                        int goal = plOneMatch.get(i).getGoal();
+                                        //System.out.println(urls.text() + "Голов было = " + go);
+                                        plOneMatch.get(i).setGoal(++goal);
+                                    }
+                                }
                            }
                         }else{//с ассистом
                             String[] ch = urls.text().split(" ");
