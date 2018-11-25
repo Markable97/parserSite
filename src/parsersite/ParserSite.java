@@ -215,10 +215,48 @@ public class ParserSite {
                                 }
                             }
                         }
+                    }else if(sizeMember == 4){
+                        //если есть предупреждение и нереализованные пенальти
+                        Element action = members.get(2); //Берем сначла предупреждения
+                        Elements spanAction = action.select("span");
+                        for(Element span : spanAction){
+                            Element link = span.select("a").first();
+                            String playerName = replaceName(link.text());
+                            String nameImage = link.select("img").attr("src");
+                            if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
+                                //Если желтая карточка
+                                for(int i = 0; i < plOneMatch.size(); i++){
+                                    if(playerName.equals(plOneMatch.get(i).getName())){
+                                        int yellow = plOneMatch.get(i).getYellow();
+                                        plOneMatch.get(i).setYellow(++yellow);
+                                    }
+                                }
+                            }else if(nameImage.equals("/theme/img/popup_rc.png")){
+                                for(int i = 0; i < plOneMatch.size(); i++){
+                                    if(playerName.equals(plOneMatch.get(i).getName())){
+                                        int red = plOneMatch.get(i).getRed();
+                                        plOneMatch.get(i).setRed(++red);
+                                    }
+                                }
+                            }
+                        }
+                        action = members.get(3);//берем пенальти
+                        spanAction = action.select("span");
+                        for(Element span : spanAction){
+                            Element link = span.select("a").first();
+                            String playerName = replaceName(link.text());
+                            for(int i = 0; i < plOneMatch.size(); i++){
+                                if(playerName.equals(plOneMatch.get(i).getName())){
+                                    int penaltyOut = plOneMatch.get(i).getPenaltyOut();
+                                    plOneMatch.get(i).setPenaltyOut(++penaltyOut);
+                                }
+                            }
+                        }
                     }
                     matches.get(numberMatch).setPlayers(plOneMatch);//добавляем к объекту матча, массив игроков
                     numberMatch++; //увеличить счетчик матча
                 }else{
+                    //Если есть приписка пернос, значения увеличиваем на +1
                     matches.get(numberMatch).setMatchTransfer(members.get(0).text());
                     Element squadTeam = members.get(1+1);
                     Elements ps = squadTeam.select("p");//захват тега <p>
@@ -331,6 +369,43 @@ public class ParserSite {
                                         int penaltyOut =  plOneMatch.get(i).getPenaltyOut();
                                          plOneMatch.get(i).setPenaltyOut(++penaltyOut);
                                     }
+                                }
+                            }
+                        }
+                    }else if(sizeMember == 4+1){
+                        //если есть предупреждение и нереализованные пенальти
+                        Element action = members.get(2+1); //Берем сначла предупреждения
+                        Elements spanAction = action.select("span");
+                        for(Element span : spanAction){
+                            Element link = span.select("a").first();
+                            String playerName = replaceName(link.text());
+                            String nameImage = link.select("img").attr("src");
+                            if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
+                                //Если желтая карточка
+                                for(int i = 0; i < plOneMatch.size(); i++){
+                                    if(playerName.equals(plOneMatch.get(i).getName())){
+                                        int yellow = plOneMatch.get(i).getYellow();
+                                        plOneMatch.get(i).setYellow(++yellow);
+                                    }
+                                }
+                            }else if(nameImage.equals("/theme/img/popup_rc.png")){
+                                for(int i = 0; i < plOneMatch.size(); i++){
+                                    if(playerName.equals(plOneMatch.get(i).getName())){
+                                        int red = plOneMatch.get(i).getRed();
+                                        plOneMatch.get(i).setRed(++red);
+                                    }
+                                }
+                            }
+                        }
+                        action = members.get(3+1);//берем пенальти
+                        spanAction = action.select("span");
+                        for(Element span : spanAction){
+                            Element link = span.select("a").first();
+                            String playerName = replaceName(link.text());
+                            for(int i = 0; i < plOneMatch.size(); i++){
+                                if(playerName.equals(plOneMatch.get(i).getName())){
+                                    int penaltyOut = plOneMatch.get(i).getPenaltyOut();
+                                    plOneMatch.get(i).setPenaltyOut(++penaltyOut);
                                 }
                             }
                         }
