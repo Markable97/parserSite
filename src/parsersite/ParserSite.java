@@ -47,7 +47,7 @@ public class ParserSite {
         String nameHome, nameGuest, dateMatch = "", referee = "", stadium = "", division = "", matchTransfer = "";
         int goalHome, goalGuest, tour = 0;
         int numberMatch = 0; 
-        Document doc = Jsoup.connect(urlDiva+"/tour2?").get();
+        Document doc = Jsoup.connect(urlDiva+"/tour8?").get();
         Elements divs = doc.select("div.some_news");
         ArrayList<Match> matches = new ArrayList<>(); //список матчей
         ArrayList<Player> playerInMatch = new ArrayList();
@@ -153,8 +153,16 @@ public class ParserSite {
                                        plOneMatch.get(i).setOwnGoal(++ownGoal);
                                    }
                                }
-                           }else{
+                           }else if(ch.equals("(пен)")){//если приписка пенальти
                                for(int i = 0; i < plOneMatch.size(); i++){
+                                    if(urls.text().equals(plOneMatch.get(i).getName())){//совпадении имени
+                                        int penalty = plOneMatch.get(i).getPenalty();
+                                        //System.out.println(urls.text() + "Голов было = " + go);
+                                        plOneMatch.get(i).setPenalty(++penalty);
+                                    }
+                                }
+                           }else{
+                                for(int i = 0; i < plOneMatch.size(); i++){
                                     if(urls.text().equals(plOneMatch.get(i).getName())){//совпадении имени
                                         int goal = plOneMatch.get(i).getGoal();
                                         //System.out.println(urls.text() + "Голов было = " + go);
@@ -310,6 +318,14 @@ public class ParserSite {
                                        plOneMatch.get(i).setOwnGoal(++ownGoal);
                                    }
                                }
+                           }else if(ch.equals("(пен)")){//если приписка пенальти)
+                               for(int i = 0; i < plOneMatch.size(); i++){
+                                    if(urls.text().equals(plOneMatch.get(i).getName())){//совпадении имени
+                                        int penalty = plOneMatch.get(i).getPenalty();
+                                        //System.out.println(urls.text() + "Голов было = " + go);
+                                        plOneMatch.get(i).setPenalty(++penalty);
+                                    }
+                                }
                            }else{
                                for(int i = 0; i < plOneMatch.size(); i++){
                                     if(urls.text().equals(plOneMatch.get(i).getName())){//совпадении имени
@@ -318,7 +334,7 @@ public class ParserSite {
                                         plOneMatch.get(i).setGoal(++goal);
                                     }
                                 }
-                           }
+                           } 
                         }else{//с ассистом
                             String[] ch = urls.text().split(" ");
                             String playerGoal = ch[0] + " " + ch[1];
