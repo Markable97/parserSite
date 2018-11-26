@@ -5,7 +5,7 @@
  */
 package parsersite;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -47,7 +47,7 @@ public class ParserSite {
         String nameHome, nameGuest, dateMatch = "", referee = "", stadium = "", division = "", matchTransfer = "";
         int goalHome, goalGuest, tour = 0;
         int numberMatch = 0; 
-        Document doc = Jsoup.connect(urlDiva+"/tour8?").get();
+        Document doc = Jsoup.connect(urlDiva+"/tour1?").get();
         Elements divs = doc.select("div.some_news");
         ArrayList<Match> matches = new ArrayList<>(); //список матчей
         ArrayList<Player> playerInMatch = new ArrayList();
@@ -199,19 +199,24 @@ public class ParserSite {
                             Element link = span.select("a").first();
                             String playerName = replaceName(link.text());
                             String nameImage = link.select("img").attr("src");
+                            String[] ch = span.text().split(",");
                             if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
                                 //Если желтая карточка
                                 for(int i = 0; i < plOneMatch.size(); i++){
                                     if(playerName.equals(plOneMatch.get(i).getName())){
                                         int yellow = plOneMatch.get(i).getYellow();
+                                        String article = plOneMatch.get(i).getArticle();
                                         plOneMatch.get(i).setYellow(++yellow);
+                                        plOneMatch.get(i).setArticle(article + ";" + (ch[1]).trim());
                                     }
                                 }
                             }else if(nameImage.equals("/theme/img/popup_rc.png")){
                                 for(int i = 0; i < plOneMatch.size(); i++){
                                     if(playerName.equals(plOneMatch.get(i).getName())){
+                                        String article = plOneMatch.get(i).getArticle();
                                         int red = plOneMatch.get(i).getRed();
                                         plOneMatch.get(i).setRed(++red);
+                                        plOneMatch.get(i).setArticle(article + ";" + (ch[1]).trim() + ";");
                                     }
                                 }
                             }else{
@@ -231,19 +236,24 @@ public class ParserSite {
                             Element link = span.select("a").first();
                             String playerName = replaceName(link.text());
                             String nameImage = link.select("img").attr("src");
+                            String[] ch = span.text().split(",");
                             if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
                                 //Если желтая карточка
                                 for(int i = 0; i < plOneMatch.size(); i++){
                                     if(playerName.equals(plOneMatch.get(i).getName())){
                                         int yellow = plOneMatch.get(i).getYellow();
+                                        String article = plOneMatch.get(i).getArticle();
                                         plOneMatch.get(i).setYellow(++yellow);
+                                        plOneMatch.get(i).setArticle(article + ";" + (ch[1]).trim());
                                     }
                                 }
                             }else if(nameImage.equals("/theme/img/popup_rc.png")){
                                 for(int i = 0; i < plOneMatch.size(); i++){
                                     if(playerName.equals(plOneMatch.get(i).getName())){
+                                        String article = plOneMatch.get(i).getArticle();
                                         int red = plOneMatch.get(i).getRed();
                                         plOneMatch.get(i).setRed(++red);
+                                        plOneMatch.get(i).setArticle(article + ";" + (ch[1]).trim());
                                     }
                                 }
                             }
@@ -364,19 +374,24 @@ public class ParserSite {
                             Element link = span.select("a").first();
                             String playerName = replaceName(link.text());
                             String nameImage = link.select("img").attr("src");
+                            String[] ch = span.text().split(",");
                             if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
                                 //Если желтая карточка
                                 for(int i = 0; i < plOneMatch.size(); i++){
                                     if(playerName.equals(plOneMatch.get(i).getName())){
                                         int yellow = plOneMatch.get(i).getYellow();
+                                        String article = plOneMatch.get(i).getArticle();
                                         plOneMatch.get(i).setYellow(++yellow);
+                                        plOneMatch.get(i).setArticle(article + ";" + (ch[1]).trim() + ";");
                                     }
                                 }
                             }else if(nameImage.equals("/theme/img/popup_rc.png")){
                                 for(int i = 0; i < plOneMatch.size(); i++){
                                     if(playerName.equals(plOneMatch.get(i).getName())){
+                                        String article = plOneMatch.get(i).getArticle();
                                         int red = plOneMatch.get(i).getRed();
                                         plOneMatch.get(i).setRed(++red);
+                                        plOneMatch.get(i).setArticle(article + ";" + (ch[1]).trim());
                                     }
                                 }
                             }else{
@@ -396,19 +411,24 @@ public class ParserSite {
                             Element link = span.select("a").first();
                             String playerName = replaceName(link.text());
                             String nameImage = link.select("img").attr("src");
+                            String[] ch = span.text().split(",");
                             if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
                                 //Если желтая карточка
                                 for(int i = 0; i < plOneMatch.size(); i++){
                                     if(playerName.equals(plOneMatch.get(i).getName())){
                                         int yellow = plOneMatch.get(i).getYellow();
+                                        String article = plOneMatch.get(i).getArticle();
                                         plOneMatch.get(i).setYellow(++yellow);
+                                        plOneMatch.get(i).setArticle(article + ";" + (ch[1]).trim());
                                     }
                                 }
                             }else if(nameImage.equals("/theme/img/popup_rc.png")){
                                 for(int i = 0; i < plOneMatch.size(); i++){
                                     if(playerName.equals(plOneMatch.get(i).getName())){
+                                        String article = plOneMatch.get(i).getArticle();
                                         int red = plOneMatch.get(i).getRed();
                                         plOneMatch.get(i).setRed(++red);
+                                        plOneMatch.get(i).setArticle(article + ";" + (ch[1]).trim());
                                     }
                                 }
                             }

@@ -21,6 +21,7 @@ public class Player {
     int assist;
     int yellow;
     int red;
+    String article = "";
     int penalty;
     int penaltyOut;
     int ownGoal;
@@ -104,6 +105,14 @@ public class Player {
         return ownGoal;
     }
 
+    public String getArticle() {
+        return article;
+    }
+
+    public void setArticle(String article) {
+        this.article = article;
+    }
+
     
     
     public String getName() {
@@ -130,12 +139,13 @@ public class Player {
     public String toString() {
         return "Player{" + "name=" + name + ", team=" + team + ", amplua=" + amplua + 
                 ", birthday=" + birthday + ", number=" + number + ", games=" + games + 
-                ", goal=" + goal + ", assist=" + assist + ", yellow=" + yellow + ", red=" + 
-                red + ", penalty=" + penalty + ", penaltyOut=" + penaltyOut + ", ownGoal=" + ownGoal + "}\n";
+                ", goal=" + goal + ", assist=" + assist + ", yellow=" + yellow + ", red=" + red + 
+                ", article=" + article + ", penalty=" + penalty + ", penaltyOut=" + penaltyOut + 
+                ", ownGoal=" + ownGoal + "}\n";
     }
 
     
 
     
-   
+  
 }
