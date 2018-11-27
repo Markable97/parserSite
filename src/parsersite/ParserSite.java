@@ -28,7 +28,9 @@ public class ParserSite {
      */
     public static void main(String[] args) throws IOException {
         System.out.println("Начало парсинга");
-        parsingPlayerInMatch();
+        ParserOtherDivs otherDivs = new ParserOtherDivs();
+        System.out.println(otherDivs.toString());
+        //parsingPlayerInMatch();
         /*Document docTournament = Jsoup.connect(urlDiva).get();
         Element teamTable = docTournament.getElementById("table_tab_slide_0");
         Elements teamUrls = teamTable.select("td.left_align_table > a");
