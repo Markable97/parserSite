@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /**
  *
@@ -27,12 +29,14 @@ public class ParserOtherDivs {
     //твои переменные броха 
     public ParserOtherDivs() throws IOException {
         this.url = "http://lfl.ru/tournament4342/tour1";
+        players = new ArrayList<>();
         mainParserDivs();
     }
     
     private void mainParserDivs() throws IOException{
         Document doc = Jsoup.connect(url).get();
         test = doc.title();
+        parseSquad(doc);
     }
     
     private void parsResults(Document doc){
@@ -41,7 +45,24 @@ public class ParserOtherDivs {
     }
     
     private void parseSquad(Document doc){
-        
+        Elements divsRight = doc.select("div.match_right");
+        for(Element d : divsRight){
+            //проход по сосставу на матч
+            Elements p = d.select("p.match_right_head");
+            for(int i = 0; i < p.size(); i++){
+                String str = p.get(i).text();
+                if(str.equals("Составы:")){
+                    Element div = p.get(i).nextElementSibling();//div блок с составом
+                    Elements span = div.select("p>span");
+                    System.out.println(div.html()+"\n\n");
+                }
+            }
+            Elements members = d.select("div.match_members");
+            boolean f = ParserSite.findMatchWithTransfer(members.get(0).text());
+            if(f == false){
+                
+            }
+        }
     }
     private void parseActiveSquad(Document doc){
         
