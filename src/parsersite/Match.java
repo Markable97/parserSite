@@ -37,6 +37,19 @@ public class Match {
         this.referee = referee;
     }
 
+    public Match(String division, int tour, String dateMatch, String teamHome, int goalHome, int goalGuest, String teamGuest, ArrayList<Player> players, String stadium, String referee) {
+        this.division = division;
+        this.tour = tour;
+        this.dateMatch = dateMatch;
+        this.teamHome = teamHome;
+        this.goalHome = goalHome;
+        this.goalGuest = goalGuest;
+        this.teamGuest = teamGuest;
+        this.players = players;
+        this.stadium = stadium;
+        this.referee = referee;
+    }
+    
     public Match(String division, int tour, String teamHome, String teamGuest, String matchTransfer) {
         //Если перенос то указываем команду переноса (Может быть пепенос лиги)
         this.division = division;

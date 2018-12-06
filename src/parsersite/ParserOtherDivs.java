@@ -85,17 +85,20 @@ public class ParserOtherDivs {
             goalHome = Integer.parseInt(score.get(0).text());
             goalGuest = Integer.parseInt(score.get(2).text());
             System.out.println(nameHome + " " + goalHome+ ":" + goalGuest + " " + nameGuest );
-            matches.add(new Match(division, tour, dateMatch, nameHome, goalHome, goalGuest, nameGuest, stadium, referee));
+            //matches.add(new Match(division, tour, dateMatch, nameHome, goalHome, goalGuest, nameGuest, stadium, referee));
             Element divRight = some_news.select("div.match_right").first();
-            parseSquad(divRight, nameHome, nameGuest);
+            matches.add(new Match(division, tour, dateMatch, nameHome, goalHome, goalGuest, nameGuest,
+                    parseSquad(divRight, nameHome, nameGuest), stadium, referee));
+            //parseSquad(divRight, nameHome, nameGuest);
         }else{
             //если есть перенос
         }
         
     }
     
-    private void parseSquad(Element divRight , String nameHome, String nameGuest){
+    private ArrayList<Player> parseSquad(Element divRight , String nameHome, String nameGuest){
             //проход по сосставу на матч
+        players.clear();//очистка перед каждым проходом по составам    
         Elements p = divRight.select("p.match_right_head");
         for(int i = 0; i < p.size(); i++){
             String str = p.get(i).text();
@@ -112,6 +115,7 @@ public class ParserOtherDivs {
                 }
             }
         }
+        return players;
     }
     private void parseActiveSquad(Document doc){
         
@@ -120,8 +124,9 @@ public class ParserOtherDivs {
 
     @Override
     public String toString() {
-        return "ParserOtherDivs{" + "players=" + players + '}';
+        return "ParserOtherDivs{" + "matches=" + matches + '}';
     }
+
     
     
 }
