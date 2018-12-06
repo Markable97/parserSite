@@ -91,7 +91,25 @@ public class ParserOtherDivs {
                     parseSquad(divRight, nameHome, nameGuest), stadium, referee));
             //parseSquad(divRight, nameHome, nameGuest);
         }else{
-            //если есть перенос
+            //если есть перенос и матч не сыгран
+            for(int i = 0; i < spans.size(); i++){
+                    Element e = spans.get(i);
+                    switch(i){
+                        case 0: 
+                            division = replaceNameDivision(e.text());
+                            break;
+                        case 1:
+                            tour = Integer.parseInt(e.text());
+                            break;
+                    }
+                }
+                //инфо о камндах
+            Elements divLeft = some_news.select("div.match_left");
+            nameHome = replaceNameTeam( divLeft.select("div.match_team.match_team_home > p.match_team_name").text() );
+            nameGuest = replaceNameTeam( divLeft.select("div.match_team.match_team_away > p.match_team_name").text() );
+            matchTransfer = some_news.select("div.match_right > div.match_members").text();
+            //System.out.println("\t\t" +division + " " + tour + " " + nameHome + " " + nameGuest + " " + matchTransfer);
+            matches.add(new Match(division, tour, nameHome, nameGuest, matchTransfer));
         }
         
     }
