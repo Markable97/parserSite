@@ -25,7 +25,7 @@ public class Match {
     String matchTransfer;
 
     public Match(String division, int tour, String dateMatch, String teamHome, int goalHome, int goalGuest, String teamGuest, String stadium, String referee) {
-        //Если матч сыгран
+        //Если матч сыгран для вышки
         this.division = division;
         this.tour = tour;
         this.dateMatch = dateMatch;
@@ -37,7 +37,25 @@ public class Match {
         this.referee = referee;
     }
 
+    public Match(String division, int tour, String dateMatch, String teamHome, int goalHome, int goalGuest, String teamGuest, ArrayList<Player> players, String stadium, String referee, String matchTransfer) {
+        //Если игра сыграна и был перенос для otherDivs
+        this.division = division;
+        this.tour = tour;
+        this.dateMatch = dateMatch;
+        this.teamHome = teamHome;
+        this.goalHome = goalHome;
+        this.goalGuest = goalGuest;
+        this.teamGuest = teamGuest;
+        this.players = players;
+        this.stadium = stadium;
+        this.referee = referee;
+        this.matchTransfer = matchTransfer;
+    }
+
+    
+    
     public Match(String division, int tour, String dateMatch, String teamHome, int goalHome, int goalGuest, String teamGuest, ArrayList<Player> players, String stadium, String referee) {
+        //Когда нет переноса и игра сыграна
         this.division = division;
         this.tour = tour;
         this.dateMatch = dateMatch;

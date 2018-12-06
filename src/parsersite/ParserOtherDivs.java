@@ -53,7 +53,8 @@ public class ParserOtherDivs {
         Element head = some_news.select("div.match_head").first();
         Elements spans = head.select("span");
         if(!spans.get(2).text().equals("Дата и время: - -")){
-            //если нет переноса
+            //если нет переноса и игра сыграна
+            
             for(int i = 0; i < spans.size(); i++){
                 Element e = spans.get(i);
                 switch(i){
@@ -87,8 +88,19 @@ public class ParserOtherDivs {
             System.out.println(nameHome + " " + goalHome+ ":" + goalGuest + " " + nameGuest );
             //matches.add(new Match(division, tour, dateMatch, nameHome, goalHome, goalGuest, nameGuest, stadium, referee));
             Element divRight = some_news.select("div.match_right").first();
-            matches.add(new Match(division, tour, dateMatch, nameHome, goalHome, goalGuest, nameGuest,
-                    parseSquad(divRight, nameHome, nameGuest), stadium, referee));
+            Element span = divRight.select("div.match_members").first();
+            boolean f = ParserSite.findMatchWithTransfer(span.text());
+            if(f==true){
+                //перенос и игра сыграна
+                matchTransfer = span.text();
+                matches.add(new Match(division, tour, dateMatch, nameHome, goalHome, goalGuest, nameGuest, 
+                        parseSquad(divRight, nameHome, nameGuest), stadium, referee, matchTransfer));
+            }else{
+                //нет переноса
+                matches.add(new Match(division, tour, dateMatch, nameHome, goalHome, goalGuest, nameGuest,
+                        parseSquad(divRight, nameHome, nameGuest), stadium, referee));
+            }
+            
             //parseSquad(divRight, nameHome, nameGuest);
         }else{
             //если есть перенос и матч не сыгран
