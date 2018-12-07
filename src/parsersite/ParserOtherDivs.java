@@ -171,6 +171,18 @@ public class ParserOtherDivs {
                         pl.setOwnGoal(own_goal);
                         //int ownGoal = pl.getOwnGoal();
                         //pl.setOwnGoal(++ownGoal);
+                    }else if(arraySquad[j].contains("(пен)")){
+                        String s = arraySquad[j].replace(" (пен)", "");
+                        arraySquad[j] = s;
+                        Player pl = findPlayer(players, replaceName(arraySquad[j]));
+                        int penalty = activePlayet(arraySquad[j].trim());
+                        pl.setPenalty(penalty);
+                    }
+                    else{
+                        //если просто голы
+                        Player pl = findPlayer(players, replaceName(arraySquad[j]));
+                        int goal = activePlayet(arraySquad[j].trim());
+                        pl.setGoal(goal);
                     }
                 }
 
@@ -189,6 +201,7 @@ public class ParserOtherDivs {
     }
     
     private int activePlayet(String str){
+        str = str.replace("Восток","").trim();
         String[] s = str.split(" ");
         //System.out.println("Ghtttttt = " + s[2]);
         String ss = s[2].replaceAll("[(|)]+", "");
@@ -197,6 +210,7 @@ public class ParserOtherDivs {
     }
     
     private String replaceName(String str){
+        str = str.replace("Восток","").trim();
         if(str.contains("(вр)")){
             str = str.replace("(вр)", "");
         }
