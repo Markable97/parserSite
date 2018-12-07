@@ -186,6 +186,20 @@ public class ParserOtherDivs {
                     }
                 }
 
+            }else if(str.equals("Ассистенты:")){
+                Element div = p.get(i).nextElementSibling();//div блок с голами
+                String[] arraySquad = div.text().split(";");//разбивка через ;
+                String team = nameHome; //для запсии команды в класс
+                 for(int j = 0; j < arraySquad.length; j++){
+                     if(arraySquad[j].contains(nameGuest)){
+                        team = nameGuest;//если встретилась команда, то меняем (действия игроков гостей)
+                    }
+                    arraySquad[j] = arraySquad[j].replace(team + " ","");//удаляем команду у первых вхождений 
+                    Player pl = findPlayer(players, replaceName(arraySquad[j]));
+                    int assist = activePlayet(arraySquad[j].trim());
+                    pl.setAssist(assist);
+                 }
+                
             }
         }
     }
