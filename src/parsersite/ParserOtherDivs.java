@@ -199,6 +199,23 @@ public class ParserOtherDivs {
                     int assist = activePlayet(arraySquad[j].trim());
                     pl.setAssist(assist);
                  }
+            }else if(str.equals("Предупреждения:")){
+                Element div = p.get(i).nextElementSibling();//div блок с голами
+                Elements spans = div.select("span");
+                for(Element span : spans){
+                    Element link = span.selectFirst("a");
+                    String playerName = replaceName(link.text());
+                    String nameImage = link.select("img").attr("src");
+                    if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
+                        Player pl = findPlayer(players,playerName);
+                        int yellow = pl.getYellow();
+                        pl.setYellow(++yellow);
+                    }else if(nameImage.equals("/theme/img/popup_rc.png")){
+                        Player pl = findPlayer(players,playerName);
+                        int red = pl.getRed();
+                        pl.setRed(++red);
+                    }
+                }
                 
             }
         }
