@@ -46,7 +46,8 @@ public class Match {
         this.goalHome = goalHome;
         this.goalGuest = goalGuest;
         this.teamGuest = teamGuest;
-        this.players = players;
+        setPlayers(players);
+        //this.players = players;
         this.stadium = stadium;
         this.referee = referee;
         this.matchTransfer = matchTransfer;
@@ -63,7 +64,8 @@ public class Match {
         this.goalHome = goalHome;
         this.goalGuest = goalGuest;
         this.teamGuest = teamGuest;
-        this.players = players;
+        setPlayers(players);
+        //this.players = players;
         this.stadium = stadium;
         this.referee = referee;
     }
