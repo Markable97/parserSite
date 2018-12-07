@@ -31,7 +31,7 @@ public class ParserOtherDivs {
     private ArrayList<Player> players; //ArrayList для игроков в матче и их действие (для передачи в matches)
     //твои переменные броха 
     public ParserOtherDivs() throws IOException {
-        this.url = "http://lfl.ru/tournament4342/tour5";
+        this.url = "http://lfl.ru/tournament4342/tour14";
         players = new ArrayList<>();
         matches = new ArrayList<>();
         mainParserDivs();
@@ -128,7 +128,9 @@ public class ParserOtherDivs {
     
     private ArrayList<Player> parseSquad(Element divRight , String nameHome, String nameGuest){
             //проход по сосставу на матч
-        players.clear();//очистка перед каждым проходом по составам    
+        players.clear();//очистка перед каждым проходом по составам 
+        ArrayList<Player> plOnMatch = new ArrayList<>();
+        plOnMatch = players;
         Elements p = divRight.select("p.match_right_head");
         for(int i = 0; i < p.size(); i++){
             String str = p.get(i).text();
@@ -141,17 +143,77 @@ public class ParserOtherDivs {
                         team = nameGuest; //если есть вхождение гостей то меняем эту команду
                     }
                     arraySquad[j] = arraySquad[j].replace(team + " ", "");
-                    players.add(new Player(team, arraySquad[j]));
+                    plOnMatch.add(new Player(team, replaceName(arraySquad[j])));
                 }
             }
         }
-        return players;
+        parseActiveSquad(divRight, nameHome, nameGuest, players);
+        return plOnMatch;
     }
-    private void parseActiveSquad(Document doc){
-        
+    private void parseActiveSquad(Element divRight, String nameHome, String nameGuest, ArrayList<Player> players){
+        Elements p = divRight.select("p.match_right_head");
+        for(int i = 0; i < p.size(); i++){
+            String str = p.get(i).text();
+            if(str.equals("Голы:")){
+                Element div = p.get(i).nextElementSibling();//div блок с голами
+                String[] arraySquad = div.text().split(";");//разбивка через ;
+                String team = nameHome; //для запсии команды в класс
+                for(int j = 0; j < arraySquad.length; j++){
+                    if(arraySquad[j].contains(nameGuest)){
+                        team = nameGuest;//если встретилась команда, то меняем (действия игроков гостей)
+                    }
+                    arraySquad[j] = arraySquad[j].replace(team + " ","");//удаляем команду у первых вхождений
+                    if(arraySquad[j].contains("(аг)")){
+                        String s = arraySquad[j].replace(" (аг)", "");
+                        arraySquad[j] = s;
+                        Player pl = findPlayer(players, replaceName(arraySquad[j]));
+                        int own_goal = activePlayet(arraySquad[j].trim());
+                        pl.setOwnGoal(own_goal);
+                        //int ownGoal = pl.getOwnGoal();
+                        //pl.setOwnGoal(++ownGoal);
+                    }
+                }
+
+            }
+        }
     }
 //метод для вывода в главный метод, можешь его изменять как хочешь в принципе
 
+    private Player findPlayer(ArrayList<Player> player, String name){
+        for(int i = 0; i < player.size(); i++){
+            if(player.get(i).getName().equals(name)){
+                return player.get(i);
+            }
+        } 
+        return null;
+    }
+    
+    private int activePlayet(String str){
+        String[] s = str.split(" ");
+        //System.out.println("Ghtttttt = " + s[2]);
+        String ss = s[2].replaceAll("[(|)]+", "");
+        return Integer.parseInt(ss);
+         
+    }
+    
+    private String replaceName(String str){
+        if(str.contains("(вр)")){
+            str = str.replace("(вр)", "");
+        }
+        String[] s = str.split("\\.");
+        if(s.length>1){
+            //Есть точка и номер
+            return s[1].trim();
+        }else{
+            //Только имя
+            String[] ss = s[0].split("\\(");
+            s[0] = ss[0];
+            return s[0].trim();
+        }
+        
+        //return
+    }
+    
     @Override
     public String toString() {
         return "ParserOtherDivs{" + "matches=" + matches + '}';
