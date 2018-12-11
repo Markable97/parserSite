@@ -31,7 +31,7 @@ public class ParserOtherDivs {
     private ArrayList<Player> players; //ArrayList для игроков в матче и их действие (для передачи в matches)
     //твои переменные броха 
     public ParserOtherDivs() throws IOException {
-        this.url = "http://lfl.ru/tournament4342/tour14";
+        this.url = "http://lfl.ru/tournament4342/tour6";
         players = new ArrayList<>();
         matches = new ArrayList<>();
         mainParserDivs();
@@ -215,8 +215,17 @@ public class ParserOtherDivs {
                         int red = pl.getRed();
                         pl.setRed(++red);
                     }
+                }  
+            }else if(str.equals("Нереализованные пенальти:")){
+                Element div = p.get(i).nextElementSibling();//div блок с голами
+                Elements spans = div.select("span");
+                for(Element span : spans){
+                    Element link = span.selectFirst("a");
+                    String playerName = replaceName(link.text());
+                    Player p1 = findPlayer(players, playerName);
+                    int penaltyOut = p1.penaltyOut;
+                    p1.setPenaltyOut(++penaltyOut);
                 }
-                
             }
         }
     }
