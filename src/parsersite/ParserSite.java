@@ -653,7 +653,7 @@ public class ParserSite {
     
     static boolean findMatchWithTransfer(String str){
         String[] mainStr = str.split(" ");
-        if(mainStr[0].equals("Перенос")){
+        if(mainStr[0].equals("Перенос") || mainStr[0].equals("Техническое") || mainStr[0].equals("Обоюдный") ){
             return true;
         }else {
             return false;

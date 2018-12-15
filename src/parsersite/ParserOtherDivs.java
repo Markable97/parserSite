@@ -31,13 +31,17 @@ public class ParserOtherDivs {
     private ArrayList<Player> players; //ArrayList для игроков в матче и их действие (для передачи в matches)
     //твои переменные броха 
     public ParserOtherDivs() throws IOException {
-        this.url = "http://lfl.ru/tournament4342/tour6";
+        //this.url = "http://lfl.ru/tournament4342/tour6";
+        this.url = "http://lfl.ru/tournament4342/tour";
         players = new ArrayList<>();
         matches = new ArrayList<>();
-        mainParserDivs();
+        for(int i = 1; i < 18; i++){
+            mainParserDivs(url + i);
+        }
+        
     }
     
-    private void mainParserDivs() throws IOException{
+    private void mainParserDivs(String url) throws IOException{
         Document doc = Jsoup.connect(url).get();
         Elements divMatches = doc.select("div.some_news");
         for(Element e : divMatches){
@@ -89,6 +93,11 @@ public class ParserOtherDivs {
             //matches.add(new Match(division, tour, dateMatch, nameHome, goalHome, goalGuest, nameGuest, stadium, referee));
             Element divRight = some_news.select("div.match_right").first();
             Element span = divRight.select("div.match_members").first();
+            int check = 0; //переменная отслеживание техничсекое поражение
+            if(span == null){
+                span = divRight.select("div.technical_defeat").first();
+                check = 1;
+            }
             boolean f = ParserSite.findMatchWithTransfer(span.text());
             if(f==true){
                 //перенос и игра сыграна
