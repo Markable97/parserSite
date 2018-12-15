@@ -52,7 +52,7 @@ public class ParserOtherDivs {
     private void parsResults(Element some_news){
         //это твое бро. Нудно вытащить название команд, дивизион, тур, дата, стадион, судью
         //Если есть перенос вытащить и чей пернос также как и отображается на сайте
-        String nameHome, nameGuest, dateMatch = "", referee = "", stadium = "", division = "", matchTransfer = "";
+        String nameHome, nameGuest, dateMatch = "", referee = "", stadium = "", division = "", matchTransfer = "Перенос";
         int goalHome, goalGuest, tour = 0;
         Element head = some_news.select("div.match_head").first();
         Elements spans = head.select("span");
@@ -87,8 +87,16 @@ public class ParserOtherDivs {
             nameHome = replaceNameTeam( divLeft.select("div.match_team.match_team_home > p.match_team_name").text() );
             nameGuest = replaceNameTeam( divLeft.select("div.match_team.match_team_away > p.match_team_name").text() );
             Elements score = divLeft.select("div.match_score");
-            goalHome = Integer.parseInt(score.get(0).text());
-            goalGuest = Integer.parseInt(score.get(2).text());
+            if(score.get(0).text().equals("-")){
+                goalHome = -1; //если есть минус, то обоюдный перенос
+            }else{
+                goalHome = Integer.parseInt(score.get(0).text());
+            }
+            if(score.get(0).text().equals("-")){
+                goalGuest = -1;
+            }else{
+                goalGuest = Integer.parseInt(score.get(2).text());
+            }
             System.out.println(nameHome + " " + goalHome+ ":" + goalGuest + " " + nameGuest );
             //matches.add(new Match(division, tour, dateMatch, nameHome, goalHome, goalGuest, nameGuest, stadium, referee));
             Element divRight = some_news.select("div.match_right").first();
