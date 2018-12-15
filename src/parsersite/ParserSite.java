@@ -35,6 +35,8 @@ public class ParserSite {
             parsingPlayerInMatch(urls + i);
         }
         
+        //наччало отправки всех данных в БД. Можно сделать потоки для каждого дивизиона для ускорения выгрузки
+        
         /*Document docTournament = Jsoup.connect(urlDiva).get();
         Element teamTable = docTournament.getElementById("table_tab_slide_0");
         Elements teamUrls = teamTable.select("td.left_align_table > a");
@@ -45,7 +47,7 @@ public class ParserSite {
         System.out.println("Кол-во ссылок = " + urlList.toString());
         parsingPlayerInfo(urlList);*/
         
-    
+        
 
     }
     

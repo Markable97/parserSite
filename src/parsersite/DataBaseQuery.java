@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 /**
  *
  * @author Markable
+ * Загрузка матча с составами, в которых есть активность в бд с тригггерами для обновления других таблиц
  */
 public class DataBaseQuery {
     
