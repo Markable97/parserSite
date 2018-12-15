@@ -28,9 +28,13 @@ public class ParserSite {
      */
     public static void main(String[] args) throws IOException {
         System.out.println("Начало парсинга");
-        ParserOtherDivs otherDivs = new ParserOtherDivs();
-        System.out.println(otherDivs.toString());
-        //parsingPlayerInMatch();
+        //ParserOtherDivs otherDivs = new ParserOtherDivs();
+        //System.out.println(otherDivs.toString());
+        String urls = urlDiva + "/tour";
+        for(int i = 1; i < 11; i++){
+            parsingPlayerInMatch(urls + i);
+        }
+        
         /*Document docTournament = Jsoup.connect(urlDiva).get();
         Element teamTable = docTournament.getElementById("table_tab_slide_0");
         Elements teamUrls = teamTable.select("td.left_align_table > a");
@@ -45,11 +49,12 @@ public class ParserSite {
 
     }
     
-    static void parsingPlayerInMatch() throws IOException{
+    static void parsingPlayerInMatch(String url) throws IOException{
         String nameHome, nameGuest, dateMatch = "", referee = "", stadium = "", division = "", matchTransfer = "";
         int goalHome, goalGuest, tour = 0;
         int numberMatch = 0; 
-        Document doc = Jsoup.connect(urlDiva+"/tour1?").get();
+        //Document doc = Jsoup.connect(urlDiva+"/tour1?").get();
+        Document doc = Jsoup.connect(url).get();
         Elements divs = doc.select("div.some_news");
         ArrayList<Match> matches = new ArrayList<>(); //список матчей
         ArrayList<Player> playerInMatch = new ArrayList();
@@ -101,6 +106,12 @@ public class ParserSite {
                 Elements divRight = div.select("div.match_right");
                 //Element tag_p = div.select("p.match_right_head").first();//заголовки (Переносы, Голы, состав, передупржедния, пенальти )
                 Elements members = divRight.select("div.match_members");
+                if(members.isEmpty()){
+                    members = divRight.select("div.technical_defeat");
+                    matches.get(numberMatch).setMatchTransfer(members.text());
+                    numberMatch++;
+                    continue;
+                }
                 boolean f = findMatchWithTransfer(members.get(0).text());//смотрим первый тег и вызращаем true если есть пернос
                 if(f==false){
                     Element squadTeam = members.get(1);
@@ -138,6 +149,46 @@ public class ParserSite {
                         }
                     }else{
                         //если кол-во спан другое, то порядок записей другой
+                        Elements data;
+                        for(int i = 0; i < ps.size(); i++){
+                            String str = ps.get(i).text();
+                            if(replaceNameTeam(str).equals(nameHome)){
+                                //Домашняя команда
+                                Element p = ps.get(i).nextElementSibling();
+                                if(p.text().equals("Основной:")){
+                                    Element pSquadMain = p.nextElementSibling();//взял p c основным составом
+                                    data = pSquadMain.select("span");
+                                    for(Element s : data){
+                                        plOneMatch.add(new Player(nameHome, replaceName(s.text())));
+                                    }
+                                    Element pSquadReserve = pSquadMain.nextElementSibling();
+                                    if(pSquadReserve.text().equals("Запасные:")){
+                                        data = pSquadReserve.select("span");
+                                        for(Element s : data){
+                                            plOneMatch.add(new Player(nameHome, replaceName(s.text())));
+                                        }
+                                    }
+                                }
+                            }else if(replaceNameTeam(str).equals(nameGuest)){
+                                //Команда гостей
+                                Element p = ps.get(i).nextElementSibling();
+                                if(p.text().equals("Основной:")){
+                                    Element pSquadMain = p.nextElementSibling();//взял p c основным составом
+                                    data = pSquadMain.select("span");
+                                    for(Element s : data){
+                                        plOneMatch.add(new Player(nameGuest, replaceName(s.text())));
+                                    }
+                                    Element pName = pSquadMain.nextElementSibling();
+                                    if(pName != null && pName.text().equals("Запасные:")){//если след тег ЗАпасные то берем след тег с составом
+                                        Element pSquadReserve = pName.nextElementSibling();
+                                        data = pSquadReserve.select("span");
+                                        for(Element s : data){
+                                            plOneMatch.add(new Player(nameGuest, replaceName(s.text())));
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                     System.out.println(ps.size());
                     Element goalAndAssist = members.get(0);
