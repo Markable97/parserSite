@@ -34,19 +34,42 @@ public class DataBaseQuery {
                                             "from main_football.players\n" +
                                             "join teams on teams_id_team = id_team \n" +
                                             "where name like ? and team_name like ?);";
+    private static String sqlInsertMatch = "";//sql для вставки в таблицу match
     
     private static PreparedStatement insertPlayer;
     private static PreparedStatement updatePlayerStatistic;
     
+    private static PreparedStatement insertMatch;
+    
     private static Connection connect;
 
+    private ArrayList<Match> matches;
     ArrayList<Player> listPlayer;
     
-    public DataBaseQuery(ArrayList<Player> list) {
+    /*public DataBaseQuery(ArrayList<Player> list) {
         this.listPlayer = list;
         connection(listPlayer);
+    }*/
+    
+    public DataBaseQuery(ArrayList<Match> matches){
+        this.matches = matches;
+        connection();
     }
 
+    private static void connection(){
+        try {
+            connect = DriverManager.getConnection(url, user, password);
+        } catch (SQLException ex) {
+            Logger.getLogger(DataBaseQuery.class.getName()).log(Level.SEVERE, null, ex);
+        }finally{
+            try {
+                connect.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(DataBaseQuery.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
     private static void connection(ArrayList<Player> listPlayer) {
         try {
             connect = DriverManager.getConnection(url, user, password);
