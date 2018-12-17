@@ -22,19 +22,25 @@ public class ParserSite {
     //static String url = "http://lfl.ru/club2668/players_list"; //ссылка на список игркоов команды 
     static String urlDiva = "http://lfl.ru/tournament4341"; //ссылка на список игркоов команды 
     static ArrayList<String> urlList = new ArrayList<>();
+    static ArrayList<Match> mainArray;
     
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
         System.out.println("Начало парсинга");
+        mainArray = new ArrayList<>();
         //ParserOtherDivs otherDivs = new ParserOtherDivs();
         //System.out.println(otherDivs.toString());
         String urls = urlDiva + "/tour";
         for(int i = 1; i < 11; i++){
-            parsingPlayerInMatch(urls + i);
+            for(Match e :parsingPlayerInMatch(urls + i)){
+                mainArray.add(e);
+            }
+            System.out.println("\t\nРазмер главного массива" + mainArray.size());
         }
-        
+        System.out.println("Первый тур = " + mainArray.get(0).toString());
+        System.out.println("Последний тур = " + mainArray.get(mainArray.size()-1).toString());
         //наччало отправки всех данных в БД. Можно сделать потоки для каждого дивизиона для ускорения выгрузки
         
         /*Document docTournament = Jsoup.connect(urlDiva).get();
@@ -51,7 +57,7 @@ public class ParserSite {
 
     }
     
-    static void parsingPlayerInMatch(String url) throws IOException{
+    static ArrayList<Match> parsingPlayerInMatch(String url) throws IOException{
         String nameHome, nameGuest, dateMatch = "", referee = "", stadium = "", division = "", matchTransfer = "";
         int goalHome, goalGuest, tour = 0;
         int numberMatch = 0; 
@@ -536,8 +542,9 @@ public class ParserSite {
             }*/
         }
         //System.out.println(playerInMatch.toString());
-        System.out.println(divs.size());
-        System.out.println(matches.toString());
+        System.out.println("Кол-во на сайте = " + divs.size());
+        System.out.println("Кол-во в массиве = " + matches.size() + "\n\n\n");
+        return matches;
     }
     
    // http://lfl.ru/?ajax=1&method=tournament_squads_table&tournament_id=4341&club_id=2668
@@ -638,7 +645,7 @@ public class ParserSite {
             System.out.println("size listPlayet = " + listPlayer.size());
             parsingPlayerStatistic(url, listPlayer);
             System.out.println(listPlayer.toString());
-            DataBaseQuery baseQuery = new DataBaseQuery(listPlayer);
+            //DataBaseQuery baseQuery = new DataBaseQuery(listPlayer);
             listPlayer.clear();
             }
     }
@@ -716,5 +723,9 @@ public class ParserSite {
     static String replaceNameDivision(String str){
         String[] ch = str.split(" ");
         return ch[0] + " " + ch[1];
+    }
+
+    public ParserSite() {
+        this.mainArray = new ArrayList<Match>();
     }
 }
