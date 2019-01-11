@@ -23,13 +23,14 @@ public class ParserSite {
     static String urlDiva = "http://lfl.ru/tournament4341"; //ссылка на список игркоов команды 
     static ArrayList<String> urlList = new ArrayList<>();
     static ArrayList<Match> mainArray;
+    static ArrayList<Club> clubs;
     
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
         System.out.println("Начало парсинга");
-        mainArray = new ArrayList<>();
+        /*mainArray = new ArrayList<>();
         //ParserOtherDivs otherDivs = new ParserOtherDivs();
         //System.out.println(otherDivs.toString());
         String urls = urlDiva + "/tour";
@@ -41,8 +42,9 @@ public class ParserSite {
         }
         DataBaseQuery insertInBD = new DataBaseQuery(mainArray); //отправка для вставки в бд
         //наччало отправки всех данных в БД. Можно сделать потоки для каждого дивизиона для ускорения выгрузки
-        
-        /*Document docTournament = Jsoup.connect(urlDiva).get();
+        */
+        Document docTournament = Jsoup.connect(urlDiva).get();
+        clubs = new ArrayList<>();
         Element teamTable = docTournament.getElementById("table_tab_slide_0");
         Elements teamUrls = teamTable.select("td.left_align_table > a");
         for(Element e : teamUrls){
@@ -50,7 +52,7 @@ public class ParserSite {
             urlList.add(url);
         }
         System.out.println("Кол-во ссылок = " + urlList.toString());
-        parsingPlayerInfo(urlList);*/
+        parsingPlayerInfo(urlList);
         
         
 
@@ -71,7 +73,7 @@ public class ParserSite {
             Elements spans = head.select("span");
             //System.out.println(span.text());
             plOneMatch.clear();//очистка после каждого прохода
-            if(!spans.get(2).text().equals("Дата и время: - -")){
+            if(!spans.get(4).text().equals("Судья: -")){
                 
                 //инфо о матче (дивизион, дата, поле, судья)
                 for(int i = 0; i < spans.size(); i++){
@@ -607,46 +609,48 @@ public class ParserSite {
     
     static void parsingPlayerInfo(ArrayList<String> urlList) throws IOException{
         for(String url : urlList){
-            Document doc = Jsoup.connect(url+"/players_list").get();
-            Element allListPlayerHtml = doc.select("div.cont.all_news").last();
-            Elements infoPlayer = allListPlayerHtml.getElementsByClass("dark_blue_block");
-            String name = null, team = null, amplua = null, birthdate = null; 
-            int number = 0;
-            int k = 0;
-            for(Element aboutPlayer : infoPlayer){
-                Elements playerTitle = aboutPlayer.select("div.player_title > p");
-                System.out.println("Размер = " + playerTitle.outerHtml() + "коней!!!!!!!!!");
-                for(Element p : playerTitle){
-                    switch(k){
-                        case 0:
-                            name = replaceName(p.text());
-                            break;                      
-                        case 1:
-                            team =replaceNameTeam( p.text().replace("Текущий клуб: ", "") );
-                            break;                      
-                        case 2:
-                            amplua = p.text().replace("Амплуа: ", "");
-                            break;                      
-                        case 4:
-                            birthdate = replaceDateFormat(p.text());
-                            break;                       
-                        case 5:
-                            String text = p.text();
-                            number = Integer.parseInt(text.replace("Номер на майке: ", ""));
-                            break;                      
+            if(!(url+"/players_list").equals("http://lfl.ru/club953/players_list")){
+                Document doc = Jsoup.connect(url+"/players_list").get();
+                Element allListPlayerHtml = doc.select("div.cont.all_news").last();
+                Elements infoPlayer = allListPlayerHtml.getElementsByClass("dark_blue_block");
+                String name = null, team = "", amplua = null, birthdate = null; 
+                int number = 0;
+                int k = 0;
+                for(Element aboutPlayer : infoPlayer){
+                    Elements playerTitle = aboutPlayer.select("div.player_title > p");
+                    System.out.println("Размер = " + playerTitle.outerHtml() + "коней!!!!!!!!!");
+                    for(Element p : playerTitle){
+                        switch(k){
+                            case 0:
+                                name = replaceName(p.text());
+                                break;                      
+                            case 1:
+                                team =replaceNameTeam( p.text().replace("Текущий клуб: ", "") );
+                                break;                      
+                            case 2:
+                                amplua = p.text().replace("Амплуа: ", "");
+                                break;                      
+                            case 4:
+                                birthdate = replaceDateFormat(p.text());
+                                break;                       
+                            case 5:
+                                String text = p.text();
+                                number = Integer.parseInt(text.replace("Номер на майке: ", ""));
+                                break;                      
+                        }
+                        k++;
                     }
-                    k++;
-                }
-                k=0;
-                listPlayer.add(new Player(name, team, amplua, birthdate, number));
-                
+                    k=0;
+                    listPlayer.add(new Player(name, team, amplua, birthdate, number));
              }
+            clubs.add(new Club(team));   
             System.out.println("size listPlayet = " + listPlayer.size());
-            parsingPlayerStatistic(url, listPlayer);
+            //parsingPlayerStatistic(url, listPlayer);
             System.out.println(listPlayer.toString());
-            //DataBaseQuery baseQuery = new DataBaseQuery(listPlayer);
+            DataBaseQuery baseQuery = new DataBaseQuery(listPlayer, clubs);
             listPlayer.clear();
-            }
+            clubs.clear();            }
+        }
     }
     
     static String replaceNameTeam(String str){
