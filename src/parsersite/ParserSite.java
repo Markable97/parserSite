@@ -39,8 +39,7 @@ public class ParserSite {
             }
             System.out.println("\t\nРазмер главного массива" + mainArray.size());
         }
-        System.out.println("Первый тур = " + mainArray.get(0).toString());
-        System.out.println("Последний тур = " + mainArray.get(mainArray.size()-1).toString());
+        DataBaseQuery insertInBD = new DataBaseQuery(mainArray); //отправка для вставки в бд
         //наччало отправки всех данных в БД. Можно сделать потоки для каждого дивизиона для ускорения выгрузки
         
         /*Document docTournament = Jsoup.connect(urlDiva).get();
