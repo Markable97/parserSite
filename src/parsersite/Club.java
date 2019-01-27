@@ -12,7 +12,7 @@ package parsersite;
 public class Club {
     
     String team_name;
-    int division = 1; //Пока высший
+    int division = 2; //Пока высший
     String logo;
 
     public Club(String team_name) {

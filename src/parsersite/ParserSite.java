@@ -30,20 +30,21 @@ public class ParserSite {
      */
     public static void main(String[] args) throws IOException {
         System.out.println("Начало парсинга");
-        /*mainArray = new ArrayList<>();
+        mainArray = new ArrayList<>();
         //ParserOtherDivs otherDivs = new ParserOtherDivs();
         //System.out.println(otherDivs.toString());
         String urls = urlDiva + "/tour";
-        for(int i = 1; i < 11; i++){
+        for(int i = 1; i < 2; i++){
             for(Match e :parsingPlayerInMatch(urls + i)){
                 mainArray.add(e);
             }
             System.out.println("\t\nРазмер главного массива" + mainArray.size());
         }
+        //System.out.println(mainArray.toString());
         DataBaseQuery insertInBD = new DataBaseQuery(mainArray); //отправка для вставки в бд
         //наччало отправки всех данных в БД. Можно сделать потоки для каждого дивизиона для ускорения выгрузки
-        */
-        Document docTournament = Jsoup.connect(urlDiva).get();
+        
+        /*Document docTournament = Jsoup.connect(urlDiva).get();
         clubs = new ArrayList<>();
         Element teamTable = docTournament.getElementById("table_tab_slide_0");
         Elements teamUrls = teamTable.select("td.left_align_table > a");
@@ -52,7 +53,7 @@ public class ParserSite {
             urlList.add(url);
         }
         System.out.println("Кол-во ссылок = " + urlList.toString());
-        parsingPlayerInfo(urlList);
+        parsingPlayerInfo(urlList);*/
         
         
 
@@ -642,6 +643,7 @@ public class ParserSite {
                     }
                     k=0;
                     listPlayer.add(new Player(name, team, amplua, birthdate, number));
+                    number = 0;
              }
             clubs.add(new Club(team));   
             System.out.println("size listPlayet = " + listPlayer.size());

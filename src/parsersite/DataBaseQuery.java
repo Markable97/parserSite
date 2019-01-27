@@ -5,6 +5,7 @@
  */
 package parsersite;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -37,12 +38,43 @@ public class DataBaseQuery {
                                             "from main_football.players\n" +
                                             "join teams on teams_id_team = id_team \n" +
                                             "where name like ? and team_name like ?);";*/
-    private static String sqlInsertMatch = "";//sql для вставки в таблицу match
+    private static String sqlInsertMatch = "insert into matches\n" +
+"set id_season = (select id_season from sesons\n" +
+"					where curdate() between year_start and year_end),\n" +
+"	id_division = ?,\n" +
+"    id_tour = ?,\n" +
+"    team_home = (select id_team from teams \n" +
+"		    where team_name like ?),\n" +
+"	goal_home = ?, goal_guest = ?,\n" +
+"    team_guest = (select id_team from teams \n" +
+"		    where team_name like ?),\n" +
+"	m_date = ?, id_stadium = (select id_stadium from stadiums where name_stadium like ?),\n" +
+"    id_referee = (select id_staff from staff where staff_name like ?),\n" +
+"    transfer = ?;";//sql для вставки в таблицу match
+    
+    private static String sqlInsertPlayerInMatch = "insert into players_in_match\n" +
+"set id_match = (select id_match from v_matches\n" +
+"				where team_home like ? and team_guest like ? and id_tour = ?),\n" +
+"	id_player = (select id_player from players where name like ? and "
+            + "id_team = (select id_team from teams where team_name in (?) ) ),\n" +
+"    count_goals = ?, count_assist = ?, yellow = ?, red = ?, penalty = ?, penalty_out = ?, own_goal = ?;";
+    
+    private static String sqlInsertStaff = "insert into staff\n" +
+                                            "set id_staff = ?,\n" +
+                                            "staff_name = ?;";
+    private static String sqlProcInsertStaff = "CALL insertStaff(?);";
+    private static String sqlPocPlayerInMatche = "CALL insPlayerInMatche(?,?,?,?,?,?,?,?,?,?,?,?);";
     
     private static PreparedStatement insertPlayer;
+    
     //private static PreparedStatement updatePlayerStatistic;
     private static PreparedStatement insertTeam;
     private static PreparedStatement insertMatch;
+    //private static PreparedStatement insertPlayerInMatch;
+    //private static PreparedStatement insertStaff;
+    
+    private static CallableStatement  procStaff;
+    private static CallableStatement  procPlayerMatch;
     
     private static Connection connect;
 
@@ -57,7 +89,7 @@ public class DataBaseQuery {
     
     public DataBaseQuery(ArrayList<Match> matches){
         this.matches = matches;
-        connection();
+        connection(matches);
     }
 
     public DataBaseQuery(ArrayList<Player> player, ArrayList<Club> club){
@@ -66,14 +98,66 @@ public class DataBaseQuery {
         connection(listPlayer, listClub);
     }
     
-    private static void connection(){
+    private static void connection(ArrayList<Match> matches){
         try {
             connect = DriverManager.getConnection(url, user, password);
+            insertMatch = connect.prepareStatement(sqlInsertMatch);
+            //insertPlayerInMatch = connect.prepareStatement(sqlInsertPlayerInMatch);
+            procStaff = connect.prepareCall(sqlProcInsertStaff);
+            procPlayerMatch = connect.prepareCall(sqlPocPlayerInMatche);
+            //insertStaff = connect.prepareStatement(sqlInsertStaff);
+            for(Match m : matches){
+                System.out.println("Судья для добавения = " + m.getReferee());
+                procStaff.setString(1, m.getReferee());
+                procStaff.execute();
+                System.out.println("Судья complete = " + m.getReferee());
+                System.out.println("Матч для добавения = " + m.getTeamHome() + " " + m.getTeamGuest());
+                switch(m.getDivision()){
+                    case "Высший дивизион":
+                        insertMatch.setInt(1, 1);
+                        break;
+                    case "Первый дивизион":
+                        insertMatch.setInt(1, 2);
+                        break;
+                }
+                insertMatch.setInt(2, m.getTour());
+                insertMatch.setString(3, m.getTeamHome());
+                insertMatch.setInt(4, m.getGoalHome());
+                insertMatch.setInt(5, m.getGoalGuest());
+                insertMatch.setString(6, m.getTeamGuest());
+                insertMatch.setString(7, m.getDateMatch());
+                insertMatch.setString(8, m.getStadium());
+                insertMatch.setString(9, m.getReferee());
+                insertMatch.setString(10, m.getMatchTransfer());
+                insertMatch.executeUpdate();
+                System.out.println("complete = " + m.getTour() + " " + m.getTeamHome() + " " +  m.getTeamGuest());
+                for(Player p : m.getPlayers()){
+                    System.out.println("\t\tИгрк для добавления = " + p.getName());
+                    procPlayerMatch.setString(1, m.getTeamHome());
+                    procPlayerMatch.setString(2, m.getTeamGuest());
+                    procPlayerMatch.setInt(3, m.getTour());
+                    procPlayerMatch.setString(4,p.getName());
+                    procPlayerMatch.setString(5,p.getTeam());
+                    procPlayerMatch.setInt(6,p.getGoal());
+                    procPlayerMatch.setInt(7,p.getAssist());
+                    procPlayerMatch.setInt(8,p.getYellow());
+                    procPlayerMatch.setInt(9,p.getRed());
+                    procPlayerMatch.setInt(10, p.getPenalty());
+                    procPlayerMatch.setInt(11, p.getPenaltyOut());
+                    procPlayerMatch.setInt(12, p.getOwnGoal());
+                    procPlayerMatch.execute();
+                    System.out.println("Игрок добавлен = " + p.getName() + " " + p.getTeam());
+                }
+                System.out.println("Конец матча \n");
+            }
         } catch (SQLException ex) {
             Logger.getLogger(DataBaseQuery.class.getName()).log(Level.SEVERE, null, ex);
         }finally{
             try {
                 connect.close();
+                insertMatch.close();
+                procStaff.close();
+                procPlayerMatch.close();
             } catch (SQLException ex) {
                 Logger.getLogger(DataBaseQuery.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -125,6 +209,7 @@ public class DataBaseQuery {
             }
             try {
                 insertPlayer.close();
+                insertTeam.close();
             } catch (SQLException ex) {
                 Logger.getLogger(DataBaseQuery.class.getName()).log(Level.SEVERE, null, ex);
             }
