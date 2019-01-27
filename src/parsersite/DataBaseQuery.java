@@ -131,23 +131,26 @@ public class DataBaseQuery {
                 insertMatch.setString(10, m.getMatchTransfer());
                 insertMatch.executeUpdate();
                 System.out.println("complete = " + m.getTour() + " " + m.getTeamHome() + " " +  m.getTeamGuest());
-                for(Player p : m.getPlayers()){
-                    System.out.println("\t\tИгрк для добавления = " + p.getName());
-                    procPlayerMatch.setString(1, m.getTeamHome());
-                    procPlayerMatch.setString(2, m.getTeamGuest());
-                    procPlayerMatch.setInt(3, m.getTour());
-                    procPlayerMatch.setString(4,p.getName());
-                    procPlayerMatch.setString(5,p.getTeam());
-                    procPlayerMatch.setInt(6,p.getGoal());
-                    procPlayerMatch.setInt(7,p.getAssist());
-                    procPlayerMatch.setInt(8,p.getYellow());
-                    procPlayerMatch.setInt(9,p.getRed());
-                    procPlayerMatch.setInt(10, p.getPenalty());
-                    procPlayerMatch.setInt(11, p.getPenaltyOut());
-                    procPlayerMatch.setInt(12, p.getOwnGoal());
-                    procPlayerMatch.execute();
-                    System.out.println("Игрок добавлен = " + p.getName() + " " + p.getTeam());
+                if(m.getPlayers() != null){
+                    for(Player p : m.getPlayers()){
+                        System.out.println("\t\tИгрк для добавления = " + p.getName());
+                        procPlayerMatch.setString(1, m.getTeamHome());
+                        procPlayerMatch.setString(2, m.getTeamGuest());
+                        procPlayerMatch.setInt(3, m.getTour());
+                        procPlayerMatch.setString(4,p.getName());
+                        procPlayerMatch.setString(5,p.getTeam());
+                        procPlayerMatch.setInt(6,p.getGoal());
+                        procPlayerMatch.setInt(7,p.getAssist());
+                        procPlayerMatch.setInt(8,p.getYellow());
+                        procPlayerMatch.setInt(9,p.getRed());
+                        procPlayerMatch.setInt(10, p.getPenalty());
+                        procPlayerMatch.setInt(11, p.getPenaltyOut());
+                        procPlayerMatch.setInt(12, p.getOwnGoal());
+                        procPlayerMatch.execute();
+                        System.out.println("Игрок добавлен = " + p.getName() + " " + p.getTeam());
+                    }                    
                 }
+                        
                 System.out.println("Конец матча \n");
             }
         } catch (SQLException ex) {

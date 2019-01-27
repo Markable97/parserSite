@@ -34,7 +34,7 @@ public class ParserSite {
         //ParserOtherDivs otherDivs = new ParserOtherDivs();
         //System.out.println(otherDivs.toString());
         String urls = urlDiva + "/tour";
-        for(int i = 1; i < 2; i++){
+        for(int i = 2; i < 11; i++){
             for(Match e :parsingPlayerInMatch(urls + i)){
                 mainArray.add(e);
             }
