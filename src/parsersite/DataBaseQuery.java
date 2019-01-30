@@ -112,6 +112,14 @@ public class DataBaseQuery {
                 procStaff.execute();
                 System.out.println("Судья complete = " + m.getReferee());
                 System.out.println("Матч для добавения = " + m.getTeamHome() + " " + m.getTeamGuest());
+                if(m.getTeamHome().equals("Инвиктус") ||m.getTeamGuest().equals("Инвиктус") || 
+                        m.getTeamHome().equals("ММЗ Вперёд")||m.getTeamGuest().equals("ММЗ Вперёд")||
+                        m.getTeamHome().equals("Спарта")||m.getTeamGuest().equals("Спарта")||
+                        m.getTeamGuest().equals("Зеро")|| m.getTeamHome().equals("Стандарт")||
+                        m.getTeamGuest().equals("Капстрой")||m.getTeamGuest().equals("ВИМ-АВИА")){
+                    System.out.println("Нет таких команд");
+                    continue;
+                }
                 switch(m.getDivision()){
                     case "Высший дивизион":
                         insertMatch.setInt(1, 1);
