@@ -35,7 +35,7 @@ public class ParserOtherDivs {
         this.url = "http://lfl.ru/tournament4342/tour";
         players = new ArrayList<>();
         matches = new ArrayList<>();
-        for(int i = 1; i < 21; i++){
+        for(int i = 21; i < 22; i++){
             mainParserDivs(url + i);
         }
         DataBaseQuery baseQuery = new DataBaseQuery(matches);

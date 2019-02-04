@@ -30,18 +30,18 @@ public class ParserSite {
      */
     public static void main(String[] args) throws IOException {
         System.out.println("Начало парсинга");
-        //mainArray = new ArrayList<>();
-        ParserOtherDivs otherDivs = new ParserOtherDivs();
+        mainArray = new ArrayList<>();
+        //ParserOtherDivs otherDivs = new ParserOtherDivs();
        // System.out.println(otherDivs.toString());
-        /*String urls = urlDiva + "/tour";
-        for(int i = 15; i <= 15; i++){
+        String urls = urlDiva + "/tour";
+        for(int i = 16; i <= 16; i++){
             for(Match e :parsingPlayerInMatch(urls + i)){
                 mainArray.add(e);
             }
             System.out.println("\t\nРазмер главного массива" + mainArray.size());
         }
         //System.out.println(mainArray.toString());
-        DataBaseQuery insertInBD = new DataBaseQuery(mainArray); //отправка для вставки в бд*/
+        DataBaseQuery insertInBD = new DataBaseQuery(mainArray); //отправка для вставки в бд
         //наччало отправки всех данных в БД. Можно сделать потоки для каждого дивизиона для ускорения выгрузки
         
         /*Document docTournament = Jsoup.connect(urlDiva).get();
