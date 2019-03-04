@@ -12,6 +12,7 @@ package parsersite;
 public class Player {
     
     String name;
+    String urlPlayer;
     String team;
     String amplua;
     String birthday;
@@ -28,7 +29,14 @@ public class Player {
 
     public Player(String team, String name){
         this.team = team;
+        //this.name = name;
+        this.urlPlayer = name;
+    }
+    
+    public Player(String team, String name, String urlPlayer){
+        this.team = team;
         this.name = name;
+        this.urlPlayer = urlPlayer;
     }
     
     public Player(String name, String team, String amplua, String birthday, int number) {
@@ -59,7 +67,9 @@ public class Player {
         this.red = red;
     }
 
-    
+    public String getUrlPlayer() {
+        return urlPlayer;
+    }
     
     public int getGames() {
         return games;
@@ -137,7 +147,7 @@ public class Player {
 
     @Override
     public String toString() {
-        return "Player{" + "name=" + name + ", team=" + team + ", amplua=" + amplua + 
+        return "Player{" + "name=" + urlPlayer + ", team=" + team + ", amplua=" + amplua + 
                 ", birthday=" + birthday + ", number=" + number + ", games=" + games + 
                 ", goal=" + goal + ", assist=" + assist + ", yellow=" + yellow + ", red=" + red + 
                 ", article=" + article + ", penalty=" + penalty + ", penaltyOut=" + penaltyOut + 

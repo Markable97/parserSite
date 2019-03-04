@@ -21,6 +21,8 @@ public class ParserSite {
     static ArrayList<Player> listPlayer = new ArrayList<>();
     //static String url = "http://lfl.ru/club2668/players_list"; //ссылка на список игркоов команды 
     static String urlDiva = "http://lfl.ru/tournament4341"; //ссылка на список игркоов команды 
+    static String urlDivTable  = "http://lfl.ru/?ajax=1&method=tournament_stats_table&tournament_id=4341"; //табблица ajax дивизиона
+    static String squadTavle = "http://lfl.ru/?ajax=1&method=tournament_squads_table&tournament_id=4341&club_id="; //таблица состава с статистикой
     static ArrayList<String> urlList = new ArrayList<>();
     static ArrayList<Match> mainArray;
     static ArrayList<Club> clubs;
@@ -34,13 +36,13 @@ public class ParserSite {
         //ParserOtherDivs otherDivs = new ParserOtherDivs();
        // System.out.println(otherDivs.toString());
         String urls = urlDiva + "/tour";
-        for(int i = 16; i <= 16; i++){
+        for(int i = 19; i <= 19; i++){
             for(Match e :parsingPlayerInMatch(urls + i)){
                 mainArray.add(e);
             }
             System.out.println("\t\nРазмер главного массива" + mainArray.size());
         }
-        //System.out.println(mainArray.toString());
+        System.out.println(mainArray.toString());
         DataBaseQuery insertInBD = new DataBaseQuery(mainArray); //отправка для вставки в бд
         //наччало отправки всех данных в БД. Можно сделать потоки для каждого дивизиона для ускорения выгрузки
         
@@ -55,6 +57,16 @@ public class ParserSite {
         System.out.println("Кол-во ссылок = " + urlList.toString());
         parsingPlayerInfo(urlList);*/
         
+        /*Вытаскивает id команд*/
+        /*Document dc = Jsoup.connect(urlDivTable).get();
+        Element table = dc.select("table").first();
+        Element tbody = table.selectFirst("tbody");
+        Elements urlTeam = tbody.select("td.left_align_table > a");
+        for(Element e : urlTeam){
+            String url = getTeamId(e.attr("href"));
+            urlList.add(url);
+        }
+        System.out.println(urlList.toString());*/
         
 
     }
@@ -109,7 +121,7 @@ public class ParserSite {
                 Elements score = divLeft.select("div.match_score");
                 goalHome = Integer.parseInt(score.get(0).text());
                 goalGuest = Integer.parseInt(score.get(2).text());
-                System.out.println("\n" + nameHome + " " + goalHome+ ":" + goalGuest + " " + nameGuest );
+                System.out.println(nameHome + " " + goalHome+ ":" + goalGuest + " " + nameGuest );
                 //Добавление данных о матче в ArrayList
                 matches.add(new Match(division, tour, dateMatch, nameHome, goalHome, goalGuest, nameGuest, stadium, referee));
                 //информация о игроках(состав, действия в матче)
@@ -133,14 +145,17 @@ public class ParserSite {
                         System.out.println("Основные");
                         for(Element s : data){
                             //System.out.print(replaceName(s.text()) + " " );
-                            plOneMatch.add(new Player(nameHome, replaceName(s.text())));
+                            //plOneMatch.add(new Player(nameHome, replaceName(s.text())));
+                            Element a = s.selectFirst("a");
+                            plOneMatch.add(new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
                         }
                         p = ps.get(4);
                         data = p.select("span");
                         System.out.println("Запасные");
                         for(Element s : data){
                             //System.out.print( replaceName(s.text()) + " ");
-                            plOneMatch.add(new Player(nameHome, replaceName(s.text())));
+                            Element a = s.selectFirst("a");
+                            plOneMatch.add(new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
                         }
                         System.out.println("\n" + nameGuest);
                         p = ps.get(7);
@@ -148,14 +163,16 @@ public class ParserSite {
                         System.out.println("Основные");
                         for(Element s : data){
                             //System.out.print( replaceName(s.text()) + " ");
-                            plOneMatch.add(new Player(nameGuest, replaceName(s.text())));
+                            Element a = s.selectFirst("a");
+                            plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
                         }
                         p = ps.get(9);
                         data = p.select("span");
                         System.out.println("Запасные");
                         for(Element s : data){
                             //System.out.print( replaceName(s.text()) + " ");
-                           plOneMatch.add(new Player(nameGuest, replaceName(s.text())));
+                            Element a = s.selectFirst("a");
+                            plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
                         }
                     }else{
                         //если кол-во спан другое, то порядок записей другой
@@ -169,13 +186,15 @@ public class ParserSite {
                                     Element pSquadMain = p.nextElementSibling();//взял p c основным составом
                                     data = pSquadMain.select("span");
                                     for(Element s : data){
-                                        plOneMatch.add(new Player(nameHome, replaceName(s.text())));
+                                        Element a = s.selectFirst("a");
+                                        plOneMatch.add(new Player(nameHome,/*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
                                     }
                                     Element pSquadReserve = pSquadMain.nextElementSibling();
                                     if(pSquadReserve.text().equals("Запасные:")){
                                         data = pSquadReserve.select("span");
                                         for(Element s : data){
-                                            plOneMatch.add(new Player(nameHome, replaceName(s.text())));
+                                            Element a = s.selectFirst("a");
+                                            plOneMatch.add(new Player(nameHome,/*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
                                         }
                                     }
                                 }
@@ -186,14 +205,16 @@ public class ParserSite {
                                     Element pSquadMain = p.nextElementSibling();//взял p c основным составом
                                     data = pSquadMain.select("span");
                                     for(Element s : data){
-                                        plOneMatch.add(new Player(nameGuest, replaceName(s.text())));
+                                        Element a = s.selectFirst("a");
+                                        plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
                                     }
                                     Element pName = pSquadMain.nextElementSibling();
                                     if(pName != null && pName.text().equals("Запасные:")){//если след тег ЗАпасные то берем след тег с составом
                                         Element pSquadReserve = pName.nextElementSibling();
                                         data = pSquadReserve.select("span");
                                         for(Element s : data){
-                                            plOneMatch.add(new Player(nameGuest, replaceName(s.text())));
+                                            Element a = s.selectFirst("a");
+                                            plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
                                         }
                                     }
                                 }
@@ -208,17 +229,18 @@ public class ParserSite {
                         System.out.println(urls.text());
                         String[] s = p.text().split(" ");
                         if (urls.size() == 1){//без ассистентов
+                           String playerGoalUrl = urls.get(0).attr("href");
                            String ch = s[3];
                            if(ch.equals("(аг)")){ //если приписка автогол
                                for(int i = 0; i < plOneMatch.size(); i++){
-                                   if( urls.text().equals(plOneMatch.get(i).getName()) ){
+                                   if( urls.attr("href").equals(plOneMatch.get(i).getUrlPlayer()) ){
                                        int ownGoal = plOneMatch.get(i).getOwnGoal();
                                        plOneMatch.get(i).setOwnGoal(++ownGoal);
                                    }
                                }
                            }else if(ch.equals("(пен)")){//если приписка пенальти
                                for(int i = 0; i < plOneMatch.size(); i++){
-                                    if(urls.text().equals(plOneMatch.get(i).getName())){//совпадении имени
+                                    if(urls.attr("href").equals(plOneMatch.get(i).getUrlPlayer())){//совпадении имени
                                         int penalty = plOneMatch.get(i).getPenalty();
                                         //System.out.println(urls.text() + "Голов было = " + go);
                                         plOneMatch.get(i).setPenalty(++penalty);
@@ -226,7 +248,7 @@ public class ParserSite {
                                 }
                            }else{
                                 for(int i = 0; i < plOneMatch.size(); i++){
-                                    if(urls.text().equals(plOneMatch.get(i).getName())){//совпадении имени
+                                    if(urls.attr("href").equals(plOneMatch.get(i).getUrlPlayer())){//совпадении имени
                                         int goal = plOneMatch.get(i).getGoal();
                                         //System.out.println(urls.text() + "Голов было = " + go);
                                         plOneMatch.get(i).setGoal(++goal);
@@ -234,18 +256,20 @@ public class ParserSite {
                                 }
                            }
                         }else{//с ассистом
+                            String playerGoalUrl = urls.get(0).attr("href");
+                            String playerAssistUrl = urls.get(1).attr("href");
                             String[] ch = urls.text().split(" ");
                             String playerGoal = ch[0] + " " + ch[1];
                             String str = ch[2] + " " + ch[3];
                             String playerAssist = str.replace(")", "");
                             System.out.println("goal = " + playerGoal + " Assist = " + playerAssist);
                             for(int i = 0; i < plOneMatch.size(); i++){
-                               if(playerGoal.equals(plOneMatch.get(i).getName())){//совпадении имени
+                               if(playerGoalUrl.equals(plOneMatch.get(i).getUrlPlayer())){//совпадении имени
                                    int goal = plOneMatch.get(i).getGoal();
                                    //System.out.println(urls.text() + "Голов было = " + go);
                                    plOneMatch.get(i).setGoal(++goal);
                                }
-                               if(playerAssist.equals(plOneMatch.get(i).getName())){//совпадении имени
+                               if(playerAssistUrl.equals(plOneMatch.get(i).getUrlPlayer())){//совпадении имени
                                    int assist = plOneMatch.get(i).getAssist();
                                    //System.out.println(urls.text() + "Голов было = " + go);
                                    plOneMatch.get(i).setAssist(++assist);
@@ -260,13 +284,14 @@ public class ParserSite {
                         Elements spanAction = action.select("span");
                         for(Element span : spanAction){
                             Element link = span.select("a").first();
+                            String playerNameUrl = link.attr("href");
                             String playerName = replaceName(link.text());
                             String nameImage = link.select("img").attr("src");
                             String[] ch = span.text().split(",");
                             if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
                                 //Если желтая карточка
                                 for(int i = 0; i < plOneMatch.size(); i++){
-                                    if(playerName.equals(plOneMatch.get(i).getName())){
+                                    if(playerNameUrl.equals(plOneMatch.get(i).getUrlPlayer())){
                                         int yellow = plOneMatch.get(i).getYellow();
                                         String article = plOneMatch.get(i).getArticle();
                                         plOneMatch.get(i).setYellow(++yellow);
@@ -275,7 +300,7 @@ public class ParserSite {
                                 }
                             }else if(nameImage.equals("/theme/img/popup_rc.png")){
                                 for(int i = 0; i < plOneMatch.size(); i++){
-                                    if(playerName.equals(plOneMatch.get(i).getName())){
+                                    if(playerNameUrl.equals(plOneMatch.get(i).getUrlPlayer())){
                                         String article = plOneMatch.get(i).getArticle();
                                         int red = plOneMatch.get(i).getRed();
                                         plOneMatch.get(i).setRed(++red);
@@ -284,7 +309,7 @@ public class ParserSite {
                                 }
                             }else{
                                 for(int i = 0; i < plOneMatch.size(); i++){
-                                    if(playerName.equals(plOneMatch.get(i).getName())){
+                                    if(playerNameUrl.equals(plOneMatch.get(i).getUrlPlayer())){
                                         int penaltyOut =  plOneMatch.get(i).getPenaltyOut();
                                          plOneMatch.get(i).setPenaltyOut(++penaltyOut);
                                     }
@@ -297,13 +322,14 @@ public class ParserSite {
                         Elements spanAction = action.select("span");
                         for(Element span : spanAction){
                             Element link = span.select("a").first();
+                            String playerNameUrl = link.attr("href");
                             String playerName = replaceName(link.text());
                             String nameImage = link.select("img").attr("src");
                             String[] ch = span.text().split(",");
                             if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
                                 //Если желтая карточка
                                 for(int i = 0; i < plOneMatch.size(); i++){
-                                    if(playerName.equals(plOneMatch.get(i).getName())){
+                                    if(playerNameUrl.equals(plOneMatch.get(i).getUrlPlayer())){
                                         int yellow = plOneMatch.get(i).getYellow();
                                         String article = plOneMatch.get(i).getArticle();
                                         plOneMatch.get(i).setYellow(++yellow);
@@ -312,7 +338,7 @@ public class ParserSite {
                                 }
                             }else if(nameImage.equals("/theme/img/popup_rc.png")){
                                 for(int i = 0; i < plOneMatch.size(); i++){
-                                    if(playerName.equals(plOneMatch.get(i).getName())){
+                                    if(playerNameUrl.equals(plOneMatch.get(i).getUrlPlayer())){
                                         String article = plOneMatch.get(i).getArticle();
                                         int red = plOneMatch.get(i).getRed();
                                         plOneMatch.get(i).setRed(++red);
@@ -325,9 +351,10 @@ public class ParserSite {
                         spanAction = action.select("span");
                         for(Element span : spanAction){
                             Element link = span.select("a").first();
+                            String playerNameUrl = link.attr("href");
                             String playerName = replaceName(link.text());
                             for(int i = 0; i < plOneMatch.size(); i++){
-                                if(playerName.equals(plOneMatch.get(i).getName())){
+                                if(playerNameUrl.equals(plOneMatch.get(i).getUrlPlayer())){
                                     int penaltyOut = plOneMatch.get(i).getPenaltyOut();
                                     plOneMatch.get(i).setPenaltyOut(++penaltyOut);
                                 }
@@ -386,14 +413,14 @@ public class ParserSite {
                            String ch = s[3];
                            if(ch.equals("(аг)")){ //если приписка автогол
                                for(int i = 0; i < plOneMatch.size(); i++){
-                                   if( urls.text().equals(plOneMatch.get(i).getName()) ){
+                                   if( urls.attr("href").equals(plOneMatch.get(i).getUrlPlayer()) ){
                                        int ownGoal = plOneMatch.get(i).getOwnGoal();
                                        plOneMatch.get(i).setOwnGoal(++ownGoal);
                                    }
                                }
                            }else if(ch.equals("(пен)")){//если приписка пенальти)
                                for(int i = 0; i < plOneMatch.size(); i++){
-                                    if(urls.text().equals(plOneMatch.get(i).getName())){//совпадении имени
+                                    if(urls.attr("href").equals(plOneMatch.get(i).getUrlPlayer())){//совпадении имени
                                         int penalty = plOneMatch.get(i).getPenalty();
                                         //System.out.println(urls.text() + "Голов было = " + go);
                                         plOneMatch.get(i).setPenalty(++penalty);
@@ -401,7 +428,7 @@ public class ParserSite {
                                 }
                            }else{
                                for(int i = 0; i < plOneMatch.size(); i++){
-                                    if(urls.text().equals(plOneMatch.get(i).getName())){//совпадении имени
+                                    if(urls.attr("href").equals(plOneMatch.get(i).getUrlPlayer())){//совпадении имени
                                         int goal = plOneMatch.get(i).getGoal();
                                         //System.out.println(urls.text() + "Голов было = " + go);
                                         plOneMatch.get(i).setGoal(++goal);
@@ -415,12 +442,12 @@ public class ParserSite {
                             String playerAssist = str.replace(")", "");
                             System.out.println("goal = " + playerGoal + " Assist = " + playerAssist);
                             for(int i = 0; i < plOneMatch.size(); i++){
-                               if(playerGoal.equals(plOneMatch.get(i).getName())){//совпадении имени
+                               if(playerGoal.equals(plOneMatch.get(i).getUrlPlayer())){//совпадении имени
                                    int goal = plOneMatch.get(i).getGoal();
                                    //System.out.println(urls.text() + "Голов было = " + go);
                                    plOneMatch.get(i).setGoal(++goal);
                                }
-                               if(playerAssist.equals(plOneMatch.get(i).getName())){//совпадении имени
+                               if(playerAssist.equals(plOneMatch.get(i).getUrlPlayer())){//совпадении имени
                                    int assist = plOneMatch.get(i).getAssist();
                                    //System.out.println(urls.text() + "Голов было = " + go);
                                    plOneMatch.get(i).setAssist(++assist);
@@ -441,7 +468,7 @@ public class ParserSite {
                             if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
                                 //Если желтая карточка
                                 for(int i = 0; i < plOneMatch.size(); i++){
-                                    if(playerName.equals(plOneMatch.get(i).getName())){
+                                    if(playerName.equals(plOneMatch.get(i).getUrlPlayer())){
                                         int yellow = plOneMatch.get(i).getYellow();
                                         String article = plOneMatch.get(i).getArticle();
                                         plOneMatch.get(i).setYellow(++yellow);
@@ -450,7 +477,7 @@ public class ParserSite {
                                 }
                             }else if(nameImage.equals("/theme/img/popup_rc.png")){
                                 for(int i = 0; i < plOneMatch.size(); i++){
-                                    if(playerName.equals(plOneMatch.get(i).getName())){
+                                    if(playerName.equals(plOneMatch.get(i).getUrlPlayer())){
                                         String article = plOneMatch.get(i).getArticle();
                                         int red = plOneMatch.get(i).getRed();
                                         plOneMatch.get(i).setRed(++red);
@@ -459,7 +486,7 @@ public class ParserSite {
                                 }
                             }else{
                                 for(int i = 0; i < plOneMatch.size(); i++){
-                                    if(playerName.equals(plOneMatch.get(i).getName())){
+                                    if(playerName.equals(plOneMatch.get(i).getUrlPlayer())){
                                         int penaltyOut =  plOneMatch.get(i).getPenaltyOut();
                                          plOneMatch.get(i).setPenaltyOut(++penaltyOut);
                                     }
@@ -478,7 +505,7 @@ public class ParserSite {
                             if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
                                 //Если желтая карточка
                                 for(int i = 0; i < plOneMatch.size(); i++){
-                                    if(playerName.equals(plOneMatch.get(i).getName())){
+                                    if(playerName.equals(plOneMatch.get(i).getUrlPlayer())){
                                         int yellow = plOneMatch.get(i).getYellow();
                                         String article = plOneMatch.get(i).getArticle();
                                         plOneMatch.get(i).setYellow(++yellow);
@@ -487,7 +514,7 @@ public class ParserSite {
                                 }
                             }else if(nameImage.equals("/theme/img/popup_rc.png")){
                                 for(int i = 0; i < plOneMatch.size(); i++){
-                                    if(playerName.equals(plOneMatch.get(i).getName())){
+                                    if(playerName.equals(plOneMatch.get(i).getUrlPlayer())){
                                         String article = plOneMatch.get(i).getArticle();
                                         int red = plOneMatch.get(i).getRed();
                                         plOneMatch.get(i).setRed(++red);
@@ -502,7 +529,7 @@ public class ParserSite {
                             Element link = span.select("a").first();
                             String playerName = replaceName(link.text());
                             for(int i = 0; i < plOneMatch.size(); i++){
-                                if(playerName.equals(plOneMatch.get(i).getName())){
+                                if(playerName.equals(plOneMatch.get(i).getUrlPlayer())){
                                     int penaltyOut = plOneMatch.get(i).getPenaltyOut();
                                     plOneMatch.get(i).setPenaltyOut(++penaltyOut);
                                 }
@@ -623,7 +650,8 @@ public class ParserSite {
                     for(Element p : playerTitle){
                         switch(k){
                             case 0:
-                                name = replaceName(p.text());
+                            //name = replaceName(p.text());
+                            name = p.text();
                                 break;                      
                             case 1:
                                 team =replaceNameTeam( p.text().replace("Текущий клуб: ", "") );
@@ -653,6 +681,16 @@ public class ParserSite {
             listPlayer.clear();
             clubs.clear();            }
         }
+    }
+    
+    static String getPlayerFullName(String url) throws IOException{
+        Document doc = Jsoup.connect(url).get();        
+        Element div = doc.selectFirst("div.player_title > p.player_title_name");
+        return div.text();
+    }
+    
+    static String getTeamId(String str){  
+        return str.replace("/club", "");
     }
     
     static String replaceNameTeam(String str){
