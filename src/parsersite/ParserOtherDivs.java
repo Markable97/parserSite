@@ -35,9 +35,10 @@ public class ParserOtherDivs {
         this.url = "http://lfl.ru/tournament4342/tour";
         players = new ArrayList<>();
         matches = new ArrayList<>();
-        for(int i = 1; i < 18; i++){
+        for(int i = 21; i < 22; i++){
             mainParserDivs(url + i);
         }
+        DataBaseQuery baseQuery = new DataBaseQuery(matches);
         
     }
     
@@ -213,8 +214,10 @@ public class ParserOtherDivs {
                     }
                     arraySquad[j] = arraySquad[j].replace(team + " ","");//удаляем команду у первых вхождений 
                     Player pl = findPlayer(players, replaceName(arraySquad[j]));
-                    int assist = activePlayet(arraySquad[j].trim());
-                    pl.setAssist(assist);
+                    if(pl != null){
+                        int assist = activePlayet(arraySquad[j].trim());
+                        pl.setAssist(assist);
+                    }
                  }
             }else if(str.equals("Предупреждения:")){
                 Element div = p.get(i).nextElementSibling();//div блок с голами
@@ -225,12 +228,16 @@ public class ParserOtherDivs {
                     String nameImage = link.select("img").attr("src");
                     if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
                         Player pl = findPlayer(players,playerName);
-                        int yellow = pl.getYellow();
-                        pl.setYellow(++yellow);
+                        if(pl != null){//костыль из-за Зари (Колхоза)
+                            int yellow = pl.getYellow();
+                            pl.setYellow(++yellow);                            
+                        }
                     }else if(nameImage.equals("/theme/img/popup_rc.png")){
                         Player pl = findPlayer(players,playerName);
-                        int red = pl.getRed();
-                        pl.setRed(++red);
+                        if(pl != null){
+                            int red = pl.getRed();
+                            pl.setRed(++red);   
+                        }
                     }
                 }  
             }else if(str.equals("Нереализованные пенальти:")){

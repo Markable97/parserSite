@@ -24,20 +24,30 @@ public class ParserSite {
     static String urlDivTable  = "http://lfl.ru/?ajax=1&method=tournament_stats_table&tournament_id=4341"; //табблица ajax дивизиона
     static String squadTavle = "http://lfl.ru/?ajax=1&method=tournament_squads_table&tournament_id=4341&club_id="; //таблица состава с статистикой
     static ArrayList<String> urlList = new ArrayList<>();
+    static ArrayList<Match> mainArray;
+    static ArrayList<Club> clubs;
     
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
         System.out.println("Начало парсинга");
+        mainArray = new ArrayList<>();
         //ParserOtherDivs otherDivs = new ParserOtherDivs();
-        //System.out.println(otherDivs.toString());
+       // System.out.println(otherDivs.toString());
         String urls = urlDiva + "/tour";
-        for(int i = 19; i < 20; i++){
-            parsingPlayerInMatch(urls + i);
+        for(int i = 19; i <= 19; i++){
+            for(Match e :parsingPlayerInMatch(urls + i)){
+                mainArray.add(e);
+            }
+            System.out.println("\t\nРазмер главного массива" + mainArray.size());
         }
+        System.out.println(mainArray.toString());
+        DataBaseQuery insertInBD = new DataBaseQuery(mainArray); //отправка для вставки в бд
+        //наччало отправки всех данных в БД. Можно сделать потоки для каждого дивизиона для ускорения выгрузки
         
         /*Document docTournament = Jsoup.connect(urlDiva).get();
+        clubs = new ArrayList<>();
         Element teamTable = docTournament.getElementById("table_tab_slide_0");
         Elements teamUrls = teamTable.select("td.left_align_table > a");
         for(Element e : teamUrls){
@@ -58,9 +68,10 @@ public class ParserSite {
         }
         System.out.println(urlList.toString());*/
         
+
     }
     
-    static void parsingPlayerInMatch(String url) throws IOException{
+    static ArrayList<Match> parsingPlayerInMatch(String url) throws IOException{
         String nameHome, nameGuest, dateMatch = "", referee = "", stadium = "", division = "", matchTransfer = "";
         int goalHome, goalGuest, tour = 0;
         int numberMatch = 0; 
@@ -75,7 +86,7 @@ public class ParserSite {
             Elements spans = head.select("span");
             //System.out.println(span.text());
             plOneMatch.clear();//очистка после каждого прохода
-            if(!spans.get(2).text().equals("Дата и время: - -")){
+            if(!spans.get(4).text().equals("Судья: -")){
                 
                 //инфо о матче (дивизион, дата, поле, судья)
                 for(int i = 0; i < spans.size(); i++){
@@ -560,8 +571,9 @@ public class ParserSite {
             }*/
         }
         //System.out.println(playerInMatch.toString());
-        System.out.println(divs.size());
-        System.out.println(matches.toString());
+        System.out.println("Кол-во на сайте = " + divs.size());
+        System.out.println("Кол-во в массиве = " + matches.size() + "\n\n\n");
+        return matches;
     }
     
    // http://lfl.ru/?ajax=1&method=tournament_squads_table&tournament_id=4341&club_id=2668
@@ -625,49 +637,52 @@ public class ParserSite {
     
     static void parsingPlayerInfo(ArrayList<String> urlList) throws IOException{
         for(String url : urlList){
-            Document doc = Jsoup.connect(url+"/players_list").get();
-            Element allListPlayerHtml = doc.select("div.cont.all_news").last();
-            Elements infoPlayer = allListPlayerHtml.getElementsByClass("dark_blue_block");
-            String name = null, team = null, amplua = null, birthdate = null; 
-            int number = 0;
-            int k = 0;
-            for(Element aboutPlayer : infoPlayer){
-                Elements playerTitle = aboutPlayer.select("div.player_title > p");
-                //System.out.println("Размер = " + playerTitle.outerHtml() + "коней!!!!!!!!!");
-                for(Element p : playerTitle){
-                    switch(k){
-                        case 0:
+            if(!(url+"/players_list").equals("http://lfl.ru/club953/players_list")){
+                Document doc = Jsoup.connect(url+"/players_list").get();
+                Element allListPlayerHtml = doc.select("div.cont.all_news").last();
+                Elements infoPlayer = allListPlayerHtml.getElementsByClass("dark_blue_block");
+                String name = null, team = "", amplua = null, birthdate = null; 
+                int number = 0;
+                int k = 0;
+                for(Element aboutPlayer : infoPlayer){
+                    Elements playerTitle = aboutPlayer.select("div.player_title > p");
+                    System.out.println("Размер = " + playerTitle.outerHtml() + "коней!!!!!!!!!");
+                    for(Element p : playerTitle){
+                        switch(k){
+                            case 0:
                             //name = replaceName(p.text());
                             name = p.text();
-                            break;                      
-                        case 1:
-                            team =replaceNameTeam( p.text().replace("Текущий клуб: ", "") );
-                            break;                      
-                        case 2:
-                            amplua = p.text().replace("Амплуа: ", "");
-                            break;                      
-                        case 4:
-                            birthdate = replaceDateFormat(p.text());
-                            break;                       
-                        case 5:
-                            String text = p.text();
-                            number = Integer.parseInt(text.replace("Номер на майке: ", ""));
-                            break;                      
+                                break;                      
+                            case 1:
+                                team =replaceNameTeam( p.text().replace("Текущий клуб: ", "") );
+                                break;                      
+                            case 2:
+                                amplua = p.text().replace("Амплуа: ", "");
+                                break;                      
+                            case 4:
+                                birthdate = replaceDateFormat(p.text());
+                                break;                       
+                            case 5:
+                                String text = p.text();
+                                number = Integer.parseInt(text.replace("Номер на майке: ", ""));
+                                break;                      
+                        }
+                        k++;
                     }
-                    k++;
-                }
-                k=0;
-                listPlayer.add(new Player(name, team, amplua, birthdate, number));
-                
+                    k=0;
+                    listPlayer.add(new Player(name, team, amplua, birthdate, number));
+                    number = 0;
              }
-            System.out.println("size listPlayet = " + listPlayer.toString());
-            /*parsingPlayerStatistic(url, listPlayer);
+            clubs.add(new Club(team));   
+            System.out.println("size listPlayet = " + listPlayer.size());
+            //parsingPlayerStatistic(url, listPlayer);
             System.out.println(listPlayer.toString());
-            DataBaseQuery baseQuery = new DataBaseQuery(listPlayer);*/
+            DataBaseQuery baseQuery = new DataBaseQuery(listPlayer, clubs);
             listPlayer.clear();
-            }
+            clubs.clear();            }
+        }
     }
-   
+    
     static String getPlayerFullName(String url) throws IOException{
         Document doc = Jsoup.connect(url).get();        
         Element div = doc.selectFirst("div.player_title > p.player_title_name");
@@ -751,5 +766,9 @@ public class ParserSite {
     static String replaceNameDivision(String str){
         String[] ch = str.split(" ");
         return ch[0] + " " + ch[1];
+    }
+
+    public ParserSite() {
+        this.mainArray = new ArrayList<Match>();
     }
 }

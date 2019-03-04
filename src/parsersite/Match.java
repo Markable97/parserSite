@@ -91,7 +91,53 @@ public class Match {
     public void setMatchTransfer(String matchTransfer) {
         this.matchTransfer = matchTransfer;
     }
+
+    public String getDivision() {
+        return division;
+    }
+
+    public int getTour() {
+        return tour;
+    }
+
+    public String getDateMatch() {
+        return dateMatch;
+    }
+
+    public String getTeamHome() {
+        return teamHome;
+    }
+
+    public int getGoalHome() {
+        return goalHome;
+    }
+
+    public int getGoalGuest() {
+        return goalGuest;
+    }
+
+    public String getTeamGuest() {
+        return teamGuest;
+    }
+
+    public ArrayList<Player> getPlayers() {
+        return players;
+    }
+
+    public String getStadium() {
+        return stadium;
+    }
+
+    public String getReferee() {
+        return referee;
+    }
+
+    public String getMatchTransfer() {
+        return matchTransfer;
+    }
  
+    
+    
     @Override
     public String toString() {
         String pl = null;
