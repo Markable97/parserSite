@@ -47,6 +47,10 @@ public class Player {
         this.number = number;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+    
     public void setGames(int games) {
         this.games = games;
     }
@@ -147,7 +151,7 @@ public class Player {
 
     @Override
     public String toString() {
-        return "Player{" + "name=" + urlPlayer + ", team=" + team + ", amplua=" + amplua + 
+        return "Player{" + "name=" + name + ", url=" + urlPlayer + ", team=" + team + ", amplua=" + amplua + 
                 ", birthday=" + birthday + ", number=" + number + ", games=" + games + 
                 ", goal=" + goal + ", assist=" + assist + ", yellow=" + yellow + ", red=" + red + 
                 ", article=" + article + ", penalty=" + penalty + ", penaltyOut=" + penaltyOut + 

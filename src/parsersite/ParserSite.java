@@ -7,6 +7,8 @@ package parsersite;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -25,25 +27,42 @@ public class ParserSite {
     static String squadTavle = "http://lfl.ru/?ajax=1&method=tournament_squads_table&tournament_id=4341&club_id="; //таблица состава с статистикой
     static ArrayList<String> urlList = new ArrayList<>();
     static ArrayList<Match> mainArray;
+    static ArrayList<String> listIdPlayers  = new ArrayList<>();
     static ArrayList<Club> clubs;
     
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         System.out.println("Начало парсинга");
         mainArray = new ArrayList<>();
         //ParserOtherDivs otherDivs = new ParserOtherDivs();
        // System.out.println(otherDivs.toString());
         String urls = urlDiva + "/tour";
-        for(int i = 11; i <= 11; i++){
+        for(int i = 11; i <= 12; i++){
             for(Match e :parsingPlayerInMatch(urls + i)){
                 mainArray.add(e);
             }
             System.out.println("\t\nРазмер главного массива" + mainArray.size());
         }
+        //System.out.println(mainArray.toString());
+        System.out.println("Всего игроков = " + listIdPlayers.size());
+        MyThread t = new MyThread("Поток JOPA", mainArray, listIdPlayers, 200, listIdPlayers.size());;
+        
+        MyThread Pupa = new MyThread("1111111111", mainArray, listIdPlayers, 0, 50);
+        MyThread Xupa = new MyThread("2222222222", mainArray, listIdPlayers, 50, 100);
+        MyThread Lupa = new MyThread("3333333333", mainArray, listIdPlayers, 100, 200);
+        
+        try {
+            if(Pupa.isAlive()) Pupa.join();
+            if(Xupa.isAlive()) Xupa.join();
+            if(Lupa.isAlive()) Lupa.join();
+        } catch (InterruptedException ex) {
+           System.out.println(ex);
+        }
+        if(t.isAlive()) t.join();
         System.out.println(mainArray.toString());
-        DataBaseQuery insertInBD = new DataBaseQuery(mainArray); //отправка для вставки в бд
+        //DataBaseQuery insertInBD = new DataBaseQuery(mainArray); //отправка для вставки в бд
         //наччало отправки всех данных в БД. Можно сделать потоки для каждого дивизиона для ускорения выгрузки
         
         /*Document docTournament = Jsoup.connect(urlDiva).get();
@@ -79,7 +98,6 @@ public class ParserSite {
         Document doc = Jsoup.connect(url).get();
         Elements divs = doc.select("div.some_news");
         ArrayList<Match> matches = new ArrayList<>(); //список матчей
-        ArrayList<Player> playerInMatch = new ArrayList();
         ArrayList <Player> plOneMatch = new ArrayList<>();
         for(Element div : divs){
             Elements head = div.select("div.match_head");
@@ -148,6 +166,7 @@ public class ParserSite {
                             //plOneMatch.add(new Player(nameHome, replaceName(s.text())));
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                            addIdPlayer(a.attr("href"));
                         }
                         p = ps.get(4);
                         data = p.select("span");
@@ -156,6 +175,7 @@ public class ParserSite {
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                            addIdPlayer(a.attr("href"));
                         }
                         System.out.println("\n" + nameGuest);
                         p = ps.get(7);
@@ -165,6 +185,7 @@ public class ParserSite {
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                            addIdPlayer(a.attr("href"));
                         }
                         p = ps.get(9);
                         data = p.select("span");
@@ -173,6 +194,7 @@ public class ParserSite {
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                            addIdPlayer(a.attr("href"));
                         }
                     }else{
                         //если кол-во спан другое, то порядок записей другой
@@ -188,6 +210,7 @@ public class ParserSite {
                                     for(Element s : data){
                                         Element a = s.selectFirst("a");
                                         plOneMatch.add(new Player(nameHome,/*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                                        addIdPlayer(a.attr("href"));
                                     }
                                     Element pSquadReserve = pSquadMain.nextElementSibling();
                                     if(pSquadReserve.text().equals("Запасные:")){
@@ -195,6 +218,7 @@ public class ParserSite {
                                         for(Element s : data){
                                             Element a = s.selectFirst("a");
                                             plOneMatch.add(new Player(nameHome,/*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                                            addIdPlayer(a.attr("href"));
                                         }
                                     }
                                 }
@@ -207,6 +231,7 @@ public class ParserSite {
                                     for(Element s : data){
                                         Element a = s.selectFirst("a");
                                         plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                                        addIdPlayer(a.attr("href"));
                                     }
                                     Element pName = pSquadMain.nextElementSibling();
                                     if(pName != null && pName.text().equals("Запасные:")){//если след тег ЗАпасные то берем след тег с составом
@@ -215,6 +240,7 @@ public class ParserSite {
                                         for(Element s : data){
                                             Element a = s.selectFirst("a");
                                             plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                                            addIdPlayer(a.attr("href"));
                                         }
                                     }
                                 }
@@ -377,6 +403,7 @@ public class ParserSite {
                             //System.out.print(replaceName(s.text()) + " " );
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                            addIdPlayer(a.attr("href"));
                         }
                         p = ps.get(4);
                         data = p.select("span");
@@ -385,6 +412,7 @@ public class ParserSite {
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
                              plOneMatch.add(new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                             addIdPlayer(a.attr("href"));
                         }
                         System.out.println("\n" + nameGuest);
                         p = ps.get(7);
@@ -394,6 +422,7 @@ public class ParserSite {
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                            addIdPlayer(a.attr("href"));
                         }
                         p = ps.get(9);
                         data = p.select("span");
@@ -402,7 +431,7 @@ public class ParserSite {
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-
+                            addIdPlayer(a.attr("href"));
                         }
                     }else{
                         //если кол-во спан другое, то порядок записей другой
@@ -584,6 +613,7 @@ public class ParserSite {
         //System.out.println(playerInMatch.toString());
         System.out.println("Кол-во на сайте = " + divs.size());
         System.out.println("Кол-во в массиве = " + matches.size() + "\n\n\n");
+        System.out.println("Кол-во всего игроков = " + listIdPlayers.size());
         return matches;
     }
     
@@ -691,6 +721,22 @@ public class ParserSite {
             DataBaseQuery baseQuery = new DataBaseQuery(listPlayer, clubs);
             listPlayer.clear();
             clubs.clear();            }
+        }
+    }
+    
+    static void addIdPlayer(String id){
+        boolean f = true;
+        if(listIdPlayers.isEmpty()){
+            listIdPlayers.add(id);
+        }else{
+            for(String s : listIdPlayers){
+                if(s.equals(id)){
+                    f = false;
+                }
+            }      
+        }
+        if(f){
+            listIdPlayers.add(id);
         }
     }
     
