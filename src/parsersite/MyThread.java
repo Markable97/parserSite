@@ -39,8 +39,7 @@ public class MyThread extends Thread {
     @Override
     public void run() {
        System.out.println("Поток:" + getName() + " запущен!!!!!!!!!!!!!!!!!!!!!!!!!");
-       for(int i = start; i < end; i++){
-           System.out.println("Поток:" + getName() + " итарация" + i);
+       for(int i = start; i <= end; i++){
            try {
                Document doc = Jsoup.connect(url + listId.get(i)).get();
                Element titleName = doc.selectFirst("p.player_title_name");
@@ -49,8 +48,7 @@ public class MyThread extends Thread {
                    if (!players.isEmpty()){
                        for(Player p : players){
                             if(p.getUrlPlayer().equals(listId.get(i))){
-                                p.setName(titleName.text());
-                                System.out.println("Поток:" + getName() + " итарация" + i);
+                                p.setName(titleName.text());                                
                                 System.out.println("Поток:" + getName() + " игрок добавлен!!!!!!!!!!!!" + titleName.text());
                                 break;
                             }
@@ -62,6 +60,7 @@ public class MyThread extends Thread {
                Logger.getLogger(MyThread.class.getName()).log(Level.SEVERE, null, ex);
            }
        }
+       System.out.println("**********************Потко: " + getName() + " закончен*************************");
     }
     
     

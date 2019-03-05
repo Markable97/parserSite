@@ -39,7 +39,7 @@ public class ParserSite {
         //ParserOtherDivs otherDivs = new ParserOtherDivs();
        // System.out.println(otherDivs.toString());
         String urls = urlDiva + "/tour";
-        for(int i = 11; i <= 12; i++){
+        for(int i = 1; i <= 20; i++){
             for(Match e :parsingPlayerInMatch(urls + i)){
                 mainArray.add(e);
             }
@@ -47,22 +47,34 @@ public class ParserSite {
         }
         //System.out.println(mainArray.toString());
         System.out.println("Всего игроков = " + listIdPlayers.size());
-        MyThread t = new MyThread("Поток JOPA", mainArray, listIdPlayers, 200, listIdPlayers.size());;
+        MyThread t = null;
+        for(int i = 0; i < listIdPlayers.size(); i++){
+            Thread.sleep(1000);
+            t = new MyThread("Поток " + i,mainArray, listIdPlayers, i, i);
+            
+        }
+        try {
+                if(t.isAlive()) t.join();
+            } catch (InterruptedException ex) {
+                System.out.println(ex);
+            }
+        /*MyThread t = new MyThread("Поток JOPA", mainArray, listIdPlayers, 200, listIdPlayers.size());;
         
         MyThread Pupa = new MyThread("1111111111", mainArray, listIdPlayers, 0, 50);
         MyThread Xupa = new MyThread("2222222222", mainArray, listIdPlayers, 50, 100);
         MyThread Lupa = new MyThread("3333333333", mainArray, listIdPlayers, 100, 200);
         
         try {
+            if(t.isAlive()) t.join();
             if(Pupa.isAlive()) Pupa.join();
             if(Xupa.isAlive()) Xupa.join();
             if(Lupa.isAlive()) Lupa.join();
         } catch (InterruptedException ex) {
            System.out.println(ex);
-        }
-        if(t.isAlive()) t.join();
+        }*/
+        
         System.out.println(mainArray.toString());
-        //DataBaseQuery insertInBD = new DataBaseQuery(mainArray); //отправка для вставки в бд
+        DataBaseQuery insertInBD = new DataBaseQuery(mainArray); //отправка для вставки в бд
         //наччало отправки всех данных в БД. Можно сделать потоки для каждого дивизиона для ускорения выгрузки
         
         /*Document docTournament = Jsoup.connect(urlDiva).get();
