@@ -39,7 +39,7 @@ public class ParserSite {
         //ParserOtherDivs otherDivs = new ParserOtherDivs();
        // System.out.println(otherDivs.toString());
         String urls = urlDiva + "/tour";
-        for(int i = 1 ; i <= 2; i++){
+        for(int i = 1 ; i <= 3; i++){
             for(Match e :parsingPlayerInMatch(urls + i)){
                 mainArray.add(e);
             }
@@ -764,15 +764,11 @@ public class ParserSite {
     
     static void addIdPlayer(String id){
         boolean f = true;
-        if(listIdPlayers.isEmpty()){
-            listIdPlayers.add(id);
-        }else{
-            for(String s : listIdPlayers){
-                if(s.equals(id)){
-                    f = false;
-                }
-            }      
-        }
+        for(String s : listIdPlayers){
+            if(s.equals(id)){
+                f = false;
+            }
+        }      
         if(f){
             listIdPlayers.add(id);
         }

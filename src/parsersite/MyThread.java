@@ -46,6 +46,7 @@ public class MyThread extends Thread {
            try {
                Document doc = Jsoup.connect(url + listId.get(i)).get();
                Element titleName = doc.selectFirst("p.player_title_name");
+               boolean f = true;
                for(Match m : match){
                    ArrayList<Player> players;// = new ArrayList<>();
                    //players = m.getPlayers();
@@ -56,11 +57,14 @@ public class MyThread extends Thread {
                                 p.setName(titleName.text());                                
                                 System.out.println("Поток:" + getName() + " игрок добавлен!!!!!!!!!!!!" + titleName.text());
                                 listAllPlayers.add(new Player(p.getTeam(),titleName.text()));
+                                f = false;
                                 break;
                             }
                         }
                    }
-                   
+                   if(f == false){
+                       break;
+                   }
                }
            } catch (IOException ex) {
                Logger.getLogger(MyThread.class.getName()).log(Level.SEVERE, null, ex);
