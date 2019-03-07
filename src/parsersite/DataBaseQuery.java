@@ -92,10 +92,11 @@ public class DataBaseQuery {
         connection(matches);
     }
 
-    public DataBaseQuery(ArrayList<Player> player, ArrayList<Club> club){
-        this.listClub = club;
+    public DataBaseQuery(ArrayList<Player> player,ArrayList<Match> matches){
+        this.matches = matches;
         this.listPlayer = player;
-        connection(listPlayer, listClub);
+        connection(listPlayer, null);
+        connection(this.matches);
     }
     
     private static void connection(ArrayList<Match> matches){
@@ -116,7 +117,8 @@ public class DataBaseQuery {
                         m.getTeamHome().equals("ММЗ Вперёд")||m.getTeamGuest().equals("ММЗ Вперёд")||
                         m.getTeamHome().equals("Спарта")||m.getTeamGuest().equals("Спарта")||
                         m.getTeamGuest().equals("Зеро")|| m.getTeamHome().equals("Стандарт")||
-                        m.getTeamGuest().equals("Капстрой")||m.getTeamGuest().equals("ВИМ-АВИА")){
+                        m.getTeamGuest().equals("Капстрой")||m.getTeamGuest().equals("ВИМ-АВИА")||
+                        m.getTeamHome().equals("Селтик-М")||m.getTeamGuest().equals("Селтик-М")){
                     System.out.println("Нет таких команд");
                     continue;
                 }
@@ -179,7 +181,7 @@ public class DataBaseQuery {
         try {
             connect = DriverManager.getConnection(url, user, password);
             insertPlayer = connect.prepareStatement(sqlInser);
-            insertTeam = connect.prepareStatement(sqlInserClub);
+            /*insertTeam = connect.prepareStatement(sqlInserClub);
             //updatePlayerStatistic = connect.prepareStatement(sqlUpdate);
             for(Club c : listClub){
                 insertTeam.setInt(1, c.getDivision());
@@ -187,17 +189,27 @@ public class DataBaseQuery {
                 insertTeam.setString(3, c.getLogo());
                 insertTeam.executeUpdate();
                 System.out.println("Insert Team complete" + c.getTeam_name());
-            }
-        
+            }*/
+            //int k = 0;
             for(Player p : listPlayer){
+                /*if(k==0){
+                    k++;
+                    continue;
+                }*/
                 insertPlayer.setString(1, p.getTeam());
                 insertPlayer.setString(2, p.getName());
                 insertPlayer.setString(3, p.getAmplua());
                 insertPlayer.setString(4, p.getBirthday());
                 insertPlayer.setInt(5, p.getNumber());
                 insertPlayer.setString(6, p.getName()+".png");
-                insertPlayer.executeUpdate();
-                System.out.println("Insert complete  " + p.getName());
+                try{
+                    insertPlayer.executeUpdate();
+                    System.out.println("Insert complete  " + p.getName());
+                }catch(SQLException ex){
+                    Logger.getLogger(DataBaseQuery.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                
                 /*updatePlayerStatistic.setInt(1, p.getGames());
                 updatePlayerStatistic.setInt(2, p.getGoal());
                 updatePlayerStatistic.setInt(3, p.getAssist());
@@ -211,6 +223,7 @@ public class DataBaseQuery {
           
             
         } catch (SQLException ex) {
+            System.out.println(ex);
             Logger.getLogger(DataBaseQuery.class.getName()).log(Level.SEVERE, null, ex);
         }finally{
             try {
@@ -220,7 +233,7 @@ public class DataBaseQuery {
             }
             try {
                 insertPlayer.close();
-                insertTeam.close();
+//                insertTeam.close();
             } catch (SQLException ex) {
                 Logger.getLogger(DataBaseQuery.class.getName()).log(Level.SEVERE, null, ex);
             }

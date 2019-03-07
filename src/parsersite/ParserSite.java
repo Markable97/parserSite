@@ -39,7 +39,7 @@ public class ParserSite {
         //ParserOtherDivs otherDivs = new ParserOtherDivs();
        // System.out.println(otherDivs.toString());
         String urls = urlDiva + "/tour";
-        for(int i = 1; i <= 20; i++){
+        for(int i = 1 ; i <= 2; i++){
             for(Match e :parsingPlayerInMatch(urls + i)){
                 mainArray.add(e);
             }
@@ -50,14 +50,15 @@ public class ParserSite {
         MyThread t = null;
         for(int i = 0; i < listIdPlayers.size(); i++){
             Thread.sleep(1000);
-            t = new MyThread("Поток " + i,mainArray, listIdPlayers, i, i);
+            t = new MyThread("Поток " + i,mainArray, listIdPlayers, i, i,listPlayer);
             
         }
         try {
-                if(t.isAlive()) t.join();
-            } catch (InterruptedException ex) {
-                System.out.println(ex);
-            }
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //if(t.isAlive()) t.join();
         /*MyThread t = new MyThread("Поток JOPA", mainArray, listIdPlayers, 200, listIdPlayers.size());;
         
         MyThread Pupa = new MyThread("1111111111", mainArray, listIdPlayers, 0, 50);
@@ -72,9 +73,34 @@ public class ParserSite {
         } catch (InterruptedException ex) {
            System.out.println(ex);
         }*/
-        
+        Thread.sleep(5000);
+        if(t.isAlive()){
+            System.out.println("Поток жив");
+        }else{
+            System.out.println("Поток мертв");
+            /*boolean f = true;
+            for(Player p : listPlayer){
+                for(Match m : mainArray){
+                    if(m.getPlayers() != null){
+                        for(Player pl : m.getPlayers()){
+                            if(p.getName().equals(pl.getName())){
+                                p.setTeam(pl.getTeam());
+                                f=false;
+                                break;
+                            }
+                        }
+                    }
+                    if(f) break;
+                }
+            }*/
+            //listPlayer.remove(0);
+            //отправка для вставки в бд
+        }
+        listPlayer.remove(0);
         System.out.println(mainArray.toString());
-        DataBaseQuery insertInBD = new DataBaseQuery(mainArray); //отправка для вставки в бд
+        System.out.println(listPlayer.toString());
+        DataBaseQuery baseQuery = new DataBaseQuery(listPlayer,mainArray);
+        //DataBaseQuery insertInBD = new DataBaseQuery(mainArray); //отправка для вставки в бд
         //наччало отправки всех данных в БД. Можно сделать потоки для каждого дивизиона для ускорения выгрузки
         
         /*Document docTournament = Jsoup.connect(urlDiva).get();
@@ -730,7 +756,7 @@ public class ParserSite {
             System.out.println("size listPlayet = " + listPlayer.size());
             //parsingPlayerStatistic(url, listPlayer);
             System.out.println(listPlayer.toString());
-            DataBaseQuery baseQuery = new DataBaseQuery(listPlayer, clubs);
+     //       DataBaseQuery baseQuery = new DataBaseQuery(listPlayer, clubs);
             listPlayer.clear();
             clubs.clear();            }
         }

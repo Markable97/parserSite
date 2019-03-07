@@ -21,16 +21,19 @@ public class MyThread extends Thread {
 
     private ArrayList<Match> match;
     private ArrayList<String> listId;
+    private ArrayList<Player> listAllPlayers;
     private int end;
     private int start;
     private String url = "http://lfl.ru";
     
-    public MyThread(String name,ArrayList<Match> list, ArrayList<String> listId,  int start, int end) {
+    public MyThread(String name,ArrayList<Match> list, ArrayList<String> listId,  int start, int end, 
+            ArrayList<Player> listAllPlayers) {
         super(name);
         this.match = list;
         this.listId = listId;
         this.start = start;
         this.end = end;
+        this.listAllPlayers = listAllPlayers;
         start();
     }
 
@@ -44,12 +47,15 @@ public class MyThread extends Thread {
                Document doc = Jsoup.connect(url + listId.get(i)).get();
                Element titleName = doc.selectFirst("p.player_title_name");
                for(Match m : match){
-                   ArrayList<Player> players = m.getPlayers();
-                   if (!players.isEmpty()){
+                   ArrayList<Player> players;// = new ArrayList<>();
+                   //players = m.getPlayers();
+                   if (m.getPlayers()!=null /*!players.isEmpty()*/){
+                       players = m.getPlayers();
                        for(Player p : players){
                             if(p.getUrlPlayer().equals(listId.get(i))){
                                 p.setName(titleName.text());                                
                                 System.out.println("Поток:" + getName() + " игрок добавлен!!!!!!!!!!!!" + titleName.text());
+                                listAllPlayers.add(new Player(p.getTeam(),titleName.text()));
                                 break;
                             }
                         }

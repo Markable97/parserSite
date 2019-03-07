@@ -5,6 +5,7 @@
         <group>
             <file>file:/D:/Project/ServerTest/ParserSite/src/parsersite/ParserSite.java</file>
             <file>file:/D:/Project/ServerTest/ParserSite/src/parsersite/MyThread.java</file>
+            <file>file:/D:/Project/ServerTest/ParserSite/src/parsersite/DataBaseQuery.java</file>
             <file>file:/D:/Project/ServerTest/ParserSite/src/parsersite/Match.java</file>
             <file>file:/D:/Project/ServerTest/ParserSite/src/parsersite/Player.java</file>
         </group>

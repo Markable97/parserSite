@@ -27,10 +27,17 @@ public class Player {
     int penaltyOut;
     int ownGoal;
 
+    public Player(String name){
+        this.name = name;
+    }
+    
     public Player(String team, String name){
         this.team = team;
-        //this.name = name;
-        this.urlPlayer = name;
+        if(name.startsWith("/player")){
+            this.urlPlayer = name;
+        }else{
+            this.name = name;
+        }
     }
     
     public Player(String team, String name, String urlPlayer){
@@ -149,6 +156,10 @@ public class Player {
         return number;
     }
 
+    public void setTeam(String team) {
+        this.team = team;
+    }
+ 
     @Override
     public String toString() {
         return "Player{" + "name=" + name + ", url=" + urlPlayer + ", team=" + team + ", amplua=" + amplua + 
