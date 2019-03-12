@@ -56,7 +56,7 @@ public class MyThread extends Thread {
                             if(p.getUrlPlayer().equals(listId.get(i))){
                                 p.setName(titleName.text());                                
                                 System.out.println("Поток:" + getName() + " игрок добавлен!!!!!!!!!!!!" + titleName.text());
-                                listAllPlayers.add(new Player(p.getTeam(),titleName.text()));
+                                listAllPlayers.add(new Player(p.getTeam(),titleName.text(), p.getUrlPlayer()));
                                 f = false;
                                 break;
                             }

@@ -63,7 +63,7 @@ public class DataBaseQuery {
                                             "set id_staff = ?,\n" +
                                             "staff_name = ?;";
     private static String sqlProcInsertStaff = "CALL insertStaff(?);";
-    private static String sqlPocPlayerInMatche = "CALL insPlayerInMatche(?,?,?,?,?,?,?,?,?,?,?,?);";
+    private static String sqlPocPlayerInMatche = "CALL insPlayerInMatche2(?,?,?,?,?,?,?,?,?,?,?,?);";
     
     private static PreparedStatement insertPlayer;
     
@@ -78,8 +78,8 @@ public class DataBaseQuery {
     
     private static Connection connect;
 
-    private ArrayList<Match> matches;
-    ArrayList<Player> listPlayer;
+    private static ArrayList<Match> matches;
+    static ArrayList<Player> listPlayer;
     ArrayList<Club> listClub;
     
     /*public DataBaseQuery(ArrayList<Player> list) {
@@ -89,19 +89,22 @@ public class DataBaseQuery {
     
     public DataBaseQuery(ArrayList<Match> matches){
         this.matches = matches;
-        connection(matches);
+        //connection(matches);
     }
 
     public DataBaseQuery(ArrayList<Player> player,ArrayList<Match> matches){
-        this.matches = matches;
-        this.listPlayer = player;
-        connection(listPlayer, null);
-        connection(this.matches);
-    }
+            this.matches = matches;
+            this.listPlayer = player;
+            connection(listPlayer, null);
+            //connection(this.matches);
+            }
     
-    private static void connection(ArrayList<Match> matches){
+    private static void connection_two(ArrayList<Match> matches){
         try {
-            connect = DriverManager.getConnection(url, user, password);
+            
+            System.out.println("\n\n\n" + matches);
+            
+            //connect = DriverManager.getConnection(url, user, password);
             insertMatch = connect.prepareStatement(sqlInsertMatch);
             //insertPlayerInMatch = connect.prepareStatement(sqlInsertPlayerInMatch);
             procStaff = connect.prepareCall(sqlProcInsertStaff);
@@ -139,15 +142,32 @@ public class DataBaseQuery {
                 insertMatch.setString(8, m.getStadium());
                 insertMatch.setString(9, m.getReferee());
                 insertMatch.setString(10, m.getMatchTransfer());
-                insertMatch.executeUpdate();
+                try{
+                    insertMatch.executeUpdate();
+                }catch(SQLException ex){
+                    System.out.println("EROOOOOOOOOR!!!\n" + ex);
+                }
                 System.out.println("complete = " + m.getTour() + " " + m.getTeamHome() + " " +  m.getTeamGuest());
                 if(m.getPlayers() != null){
                     for(Player p : m.getPlayers()){
-                        System.out.println("\t\tИгрк для добавления = " + p.getName());
+                        System.out.println("\t\tИгрк для добавления = " + p.getUrlPlayer());
                         procPlayerMatch.setString(1, m.getTeamHome());
                         procPlayerMatch.setString(2, m.getTeamGuest());
                         procPlayerMatch.setInt(3, m.getTour());
-                        procPlayerMatch.setString(4,p.getName());
+                        for(Player p_name : listPlayer){
+                            
+                            if(p_name.getUrlPlayer().equals(p.getUrlPlayer())){
+                                procPlayerMatch.setString(4,p_name.getName());
+                                /*if(p.getName()!= null){
+                                    //System.out.println("БИБО = " + p_name.getName());
+                                    procPlayerMatch.setString(4,p_name.getName());
+                                }else{
+                                    System.out.println("БОБА = " + p_name.getUrlPlayer());
+                                    procPlayerMatch.setString(4,p_name.getUrlPlayer());
+                                }*/
+                                    
+                            }
+                        }
                         procPlayerMatch.setString(5,p.getTeam());
                         procPlayerMatch.setInt(6,p.getGoal());
                         procPlayerMatch.setInt(7,p.getAssist());
@@ -156,8 +176,19 @@ public class DataBaseQuery {
                         procPlayerMatch.setInt(10, p.getPenalty());
                         procPlayerMatch.setInt(11, p.getPenaltyOut());
                         procPlayerMatch.setInt(12, p.getOwnGoal());
-                        procPlayerMatch.execute();
-                        System.out.println("Игрок добавлен = " + p.getName() + " " + p.getTeam());
+                        try{
+                            procPlayerMatch.execute();
+                             System.out.println("Игрок добавлен = " + p.getName() + " " +  p.getUrlPlayer()+ " " + p.getTeam());
+                        }catch(SQLException ex){
+                            Logger.getLogger(DataBaseQuery.class.getName()).log(Level.SEVERE, null, ex);
+                            try {
+                                Thread.sleep(200);
+                            } catch (InterruptedException ex1) {
+                                Logger.getLogger(DataBaseQuery.class.getName()).log(Level.SEVERE, null, ex1);
+                            }
+                        }
+                        
+                       
                     }                    
                 }
                         
@@ -204,12 +235,12 @@ public class DataBaseQuery {
                 insertPlayer.setString(6, p.getName()+".png");
                 try{
                     insertPlayer.executeUpdate();
-                    System.out.println("Insert complete  " + p.getName());
+                    System.out.println("Insert complete  " + p.getName() + " " + p.getUrlPlayer());
                 }catch(SQLException ex){
                     Logger.getLogger(DataBaseQuery.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 
-                
+                 
                 /*updatePlayerStatistic.setInt(1, p.getGames());
                 updatePlayerStatistic.setInt(2, p.getGoal());
                 updatePlayerStatistic.setInt(3, p.getAssist());
@@ -221,16 +252,16 @@ public class DataBaseQuery {
                 System.out.println("Update complete  " + p.getName());*/
             }
           
-            
+            connection_two(DataBaseQuery.matches);   
         } catch (SQLException ex) {
             System.out.println(ex);
             Logger.getLogger(DataBaseQuery.class.getName()).log(Level.SEVERE, null, ex);
         }finally{
-            try {
+            /*try {
                 connect.close();
             } catch (SQLException ex) {
                 Logger.getLogger(DataBaseQuery.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            }*/
             try {
                 insertPlayer.close();
 //                insertTeam.close();

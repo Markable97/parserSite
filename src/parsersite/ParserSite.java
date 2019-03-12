@@ -39,7 +39,7 @@ public class ParserSite {
         //ParserOtherDivs otherDivs = new ParserOtherDivs();
        // System.out.println(otherDivs.toString());
         String urls = urlDiva + "/tour";
-        for(int i = 1 ; i <= 3; i++){
+        for(int i = 15 ; i <= 21; i++){
             for(Match e :parsingPlayerInMatch(urls + i)){
                 mainArray.add(e);
             }
@@ -49,7 +49,7 @@ public class ParserSite {
         System.out.println("Всего игроков = " + listIdPlayers.size());
         MyThread t = null;
         for(int i = 0; i < listIdPlayers.size(); i++){
-            Thread.sleep(1000);
+            Thread.sleep(2000);
             t = new MyThread("Поток " + i,mainArray, listIdPlayers, i, i,listPlayer);
             
         }
@@ -96,32 +96,30 @@ public class ParserSite {
             //listPlayer.remove(0);
             //отправка для вставки в бд
         }
-        listPlayer.remove(0);
+        //listPlayer.remove(0);
         System.out.println(mainArray.toString());
         System.out.println(listPlayer.toString());
         DataBaseQuery baseQuery = new DataBaseQuery(listPlayer,mainArray);
         //DataBaseQuery insertInBD = new DataBaseQuery(mainArray); //отправка для вставки в бд
         //наччало отправки всех данных в БД. Можно сделать потоки для каждого дивизиона для ускорения выгрузки
-        
         /*Document docTournament = Jsoup.connect(urlDiva).get();
         clubs = new ArrayList<>();
         Element teamTable = docTournament.getElementById("table_tab_slide_0");
         Elements teamUrls = teamTable.select("td.left_align_table > a");
         for(Element e : teamUrls){
-            String url = e.attr("abs:href");
-            urlList.add(url);
+        String url = e.attr("abs:href");
+        urlList.add(url);
         }
         System.out.println("Кол-во ссылок = " + urlList.toString());
         parsingPlayerInfo(urlList);*/
-        
         /*Вытаскивает id команд*/
         /*Document dc = Jsoup.connect(urlDivTable).get();
         Element table = dc.select("table").first();
         Element tbody = table.selectFirst("tbody");
         Elements urlTeam = tbody.select("td.left_align_table > a");
         for(Element e : urlTeam){
-            String url = getTeamId(e.attr("href"));
-            urlList.add(url);
+        String url = getTeamId(e.attr("href"));
+        urlList.add(url);
         }
         System.out.println(urlList.toString());*/
         
