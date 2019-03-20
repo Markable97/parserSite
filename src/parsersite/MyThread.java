@@ -41,11 +41,15 @@ public class MyThread extends Thread {
     
     @Override
     public void run() {
+       String nameAndDate = "", name = "", birthday = "";
        System.out.println("Поток:" + getName() + " запущен!!!!!!!!!!!!!!!!!!!!!!!!!");
        for(int i = start; i <= end; i++){
            try {
-               Document doc = Jsoup.connect(url + listId.get(i)).get();
-               Element titleName = doc.selectFirst("p.player_title_name");
+               //Document doc = Jsoup.connect(url + listId.get(i)).get();
+               //Element titleName = doc.selectFirst("p.player_title_name");
+               nameAndDate = ParserSite.getPlayerFullNameAndDAta(url + listId.get(i));
+               name = ParserSite.returnStr(nameAndDate, 0); //Возвращает имя
+               birthday = ParserSite.replaceDateFormat(ParserSite.returnStr(nameAndDate,1)); //Возврат даты и сразу ее изменнеие в формат MySql
                boolean f = true;
                for(Match m : match){
                    ArrayList<Player> players;// = new ArrayList<>();
@@ -54,9 +58,16 @@ public class MyThread extends Thread {
                        players = m.getPlayers();
                        for(Player p : players){
                             if(p.getUrlPlayer().equals(listId.get(i))){
-                                p.setName(titleName.text());                                
-                                System.out.println("Поток:" + getName() + " игрок добавлен!!!!!!!!!!!!" + titleName.text());
-                                listAllPlayers.add(new Player(p.getTeam(),titleName.text(), p.getUrlPlayer()));
+                                p.setName(name);                                
+                                System.out.println("Поток:" + getName() + " игрок добавлен!!!!!!!!!!!!" + name);
+                                for(Player e : listAllPlayers){
+                                    if(e.getUrlPlayer().equals(listId.get(i))){
+                                        e.setName(name);
+                                        e.setTeam(p.getTeam());
+                                        e.setBirthday(birthday);
+                                    }
+                                }
+                                //listAllPlayers.add(new Player(p.getTeam(),titleName.text(), p.getUrlPlayer()));
                                 f = false;
                                 break;
                             }

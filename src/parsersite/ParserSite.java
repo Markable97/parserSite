@@ -24,7 +24,7 @@ public class ParserSite {
     //static String url = "http://lfl.ru/club2668/players_list"; //ссылка на список игркоов команды 
     static String urlDiva = "http://lfl.ru/tournament4341"; //ссылка на список игркоов команды 
     static String urlDivTable  = "http://lfl.ru/?ajax=1&method=tournament_stats_table&tournament_id=4341"; //табблица ajax дивизиона
-    static String squadTavle = "http://lfl.ru/?ajax=1&method=tournament_squads_table&tournament_id=4341&club_id="; //таблица состава с статистикой
+    static String squadTable = "http://lfl.ru/?ajax=1&method=tournament_squads_table&tournament_id=4341&club_id="; //таблица состава с статистикой
     static ArrayList<String> urlList = new ArrayList<>();
     static ArrayList<Match> mainArray;
     static ArrayList<String> listIdPlayers  = new ArrayList<>();
@@ -35,11 +35,26 @@ public class ParserSite {
      */
     public static void main(String[] args) throws IOException, InterruptedException {
         System.out.println("Начало парсинга");
+        /*Вытаскивает id команд*/
+        Document dc = Jsoup.connect(urlDivTable).get();
+        Element table = dc.select("table").first();
+        Element tbody = table.selectFirst("tbody");
+        Elements urlTeam = tbody.select("td.left_align_table > a");
+        for(Element e : urlTeam){
+        String url = getTeamId(e.attr("href"));
+        urlList.add(url);
+        }
+        System.out.println(urlList.toString());
+        //Перелаем id и вытаскивание всех игркоов
+        for(String s : urlList){
+            parsingNewInfoPlayer(squadTable + s);
+        }
+        System.out.println("Проверка = " + listPlayer.size() + " = " + listIdPlayers.size());
         mainArray = new ArrayList<>();
         //ParserOtherDivs otherDivs = new ParserOtherDivs();
        // System.out.println(otherDivs.toString());
         String urls = urlDiva + "/tour";
-        for(int i = 15 ; i <= 21; i++){
+        for(int i = 1 ; i <= 21; i++){
             for(Match e :parsingPlayerInMatch(urls + i)){
                 mainArray.add(e);
             }
@@ -49,7 +64,7 @@ public class ParserSite {
         System.out.println("Всего игроков = " + listIdPlayers.size());
         MyThread t = null;
         for(int i = 0; i < listIdPlayers.size(); i++){
-            Thread.sleep(2000);
+            Thread.sleep(1200);
             t = new MyThread("Поток " + i,mainArray, listIdPlayers, i, i,listPlayer);
             
         }
@@ -99,6 +114,7 @@ public class ParserSite {
         //listPlayer.remove(0);
         System.out.println(mainArray.toString());
         System.out.println(listPlayer.toString());
+        System.exit(0);
         DataBaseQuery baseQuery = new DataBaseQuery(listPlayer,mainArray);
         //DataBaseQuery insertInBD = new DataBaseQuery(mainArray); //отправка для вставки в бд
         //наччало отправки всех данных в БД. Можно сделать потоки для каждого дивизиона для ускорения выгрузки
@@ -112,18 +128,8 @@ public class ParserSite {
         }
         System.out.println("Кол-во ссылок = " + urlList.toString());
         parsingPlayerInfo(urlList);*/
-        /*Вытаскивает id команд*/
-        /*Document dc = Jsoup.connect(urlDivTable).get();
-        Element table = dc.select("table").first();
-        Element tbody = table.selectFirst("tbody");
-        Elements urlTeam = tbody.select("td.left_align_table > a");
-        for(Element e : urlTeam){
-        String url = getTeamId(e.attr("href"));
-        urlList.add(url);
-        }
-        System.out.println(urlList.toString());*/
         
-
+        
     }
     
     static ArrayList<Match> parsingPlayerInMatch(String url) throws IOException{
@@ -202,7 +208,7 @@ public class ParserSite {
                             //plOneMatch.add(new Player(nameHome, replaceName(s.text())));
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                            addIdPlayer(a.attr("href"));
+                            //addIdPlayer(a.attr("href"));
                         }
                         p = ps.get(4);
                         data = p.select("span");
@@ -211,7 +217,7 @@ public class ParserSite {
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                            addIdPlayer(a.attr("href"));
+                            //addIdPlayer(a.attr("href"));
                         }
                         System.out.println("\n" + nameGuest);
                         p = ps.get(7);
@@ -221,7 +227,7 @@ public class ParserSite {
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                            addIdPlayer(a.attr("href"));
+                            //addIdPlayer(a.attr("href"));
                         }
                         p = ps.get(9);
                         data = p.select("span");
@@ -230,7 +236,7 @@ public class ParserSite {
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                            addIdPlayer(a.attr("href"));
+                            //addIdPlayer(a.attr("href"));
                         }
                     }else{
                         //если кол-во спан другое, то порядок записей другой
@@ -246,7 +252,7 @@ public class ParserSite {
                                     for(Element s : data){
                                         Element a = s.selectFirst("a");
                                         plOneMatch.add(new Player(nameHome,/*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                                        addIdPlayer(a.attr("href"));
+                                        //addIdPlayer(a.attr("href"));
                                     }
                                     Element pSquadReserve = pSquadMain.nextElementSibling();
                                     if(pSquadReserve.text().equals("Запасные:")){
@@ -254,7 +260,7 @@ public class ParserSite {
                                         for(Element s : data){
                                             Element a = s.selectFirst("a");
                                             plOneMatch.add(new Player(nameHome,/*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                                            addIdPlayer(a.attr("href"));
+                                            //addIdPlayer(a.attr("href"));
                                         }
                                     }
                                 }
@@ -267,7 +273,7 @@ public class ParserSite {
                                     for(Element s : data){
                                         Element a = s.selectFirst("a");
                                         plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                                        addIdPlayer(a.attr("href"));
+                                        //addIdPlayer(a.attr("href"));
                                     }
                                     Element pName = pSquadMain.nextElementSibling();
                                     if(pName != null && pName.text().equals("Запасные:")){//если след тег ЗАпасные то берем след тег с составом
@@ -276,7 +282,7 @@ public class ParserSite {
                                         for(Element s : data){
                                             Element a = s.selectFirst("a");
                                             plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                                            addIdPlayer(a.attr("href"));
+                                            //addIdPlayer(a.attr("href"));
                                         }
                                     }
                                 }
@@ -439,7 +445,7 @@ public class ParserSite {
                             //System.out.print(replaceName(s.text()) + " " );
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                            addIdPlayer(a.attr("href"));
+                            //addIdPlayer(a.attr("href"));
                         }
                         p = ps.get(4);
                         data = p.select("span");
@@ -448,7 +454,7 @@ public class ParserSite {
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
                              plOneMatch.add(new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                             addIdPlayer(a.attr("href"));
+                             //addIdPlayer(a.attr("href"));
                         }
                         System.out.println("\n" + nameGuest);
                         p = ps.get(7);
@@ -458,7 +464,7 @@ public class ParserSite {
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                            addIdPlayer(a.attr("href"));
+                            //addIdPlayer(a.attr("href"));
                         }
                         p = ps.get(9);
                         data = p.select("span");
@@ -467,7 +473,7 @@ public class ParserSite {
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                            addIdPlayer(a.attr("href"));
+                            //addIdPlayer(a.attr("href"));
                         }
                     }else{
                         //если кол-во спан другое, то порядок записей другой
@@ -653,6 +659,22 @@ public class ParserSite {
         return matches;
     }
     
+    static void parsingNewInfoPlayer(String url) throws IOException {
+        String name = "", urlPlayer = "", amplua = "", nameAndDate = "", birthday = "";
+        Document doc = Jsoup.connect(url).get();
+        Elements table =  doc.getElementsByTag("tbody");
+        Elements tds = table.select("td.left_align_table.FIO");
+        for(Element td : tds){
+            Element a = td.selectFirst("a.player");
+            urlPlayer = a.attr("href");
+            Element span = td.selectFirst("span.amplua");
+            amplua = span.text();
+            System.out.println(" Name = " + name + " Url = " + urlPlayer + " Date = " + birthday + " Amplua =  " + amplua);
+            listIdPlayers.add(urlPlayer);
+            listPlayer.add(new Player(urlPlayer, 0, amplua));
+        }
+        
+    }
    // http://lfl.ru/?ajax=1&method=tournament_squads_table&tournament_id=4341&club_id=2668
     
     static void parsingPlayerStatistic(String url, ArrayList<Player> players) throws IOException{
@@ -772,6 +794,29 @@ public class ParserSite {
         }
     }
     
+    static String returnStr(String str, int pos){
+        String[] ch = str.split("\\|");
+        try {
+            return ch[pos];
+        }catch(Exception e){
+            System.out.println("Не правельный индекс массива. Нет номера элемента \n"+e);
+            return "Ошибка!";
+        }
+    }
+    
+    static String getPlayerFullNameAndDAta(String url) throws IOException{
+        String str = "";
+        Document doc = Jsoup.connect(url).get();        
+        Elements ps = doc.select("div.player_title > p");
+        for(int i = 0; i < ps.size(); i++ ){
+            switch (i) {
+                case 0: str+=ps.get(i).text(); break;
+                case 2: str+= ps.get(i).text().replace("Дата рождения: ","|");break;
+            }
+        }
+        return str;
+    }
+    
     static String getPlayerFullName(String url) throws IOException{
         Document doc = Jsoup.connect(url).get();        
         Element div = doc.selectFirst("div.player_title > p.player_title_name");
@@ -815,7 +860,7 @@ public class ParserSite {
     static String replaceDateFormat(String str){
         String mainStr = "";
         String strNotText = str.replace("Дата рождения: ", "");
-        System.out.println(strNotText);
+        //System.out.println(strNotText);
         String[] numbers = strNotText.split("\\.");
         for(int i = numbers.length - 1; i >= 0; i--){
             if(i==0){
@@ -823,7 +868,7 @@ public class ParserSite {
             }else
                 mainStr+=numbers[i]+'-';
         }
-        System.out.println(mainStr);
+        //System.out.println(mainStr);
         return mainStr;
     }
 

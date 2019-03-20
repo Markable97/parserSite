@@ -53,13 +53,22 @@ public class Player {
         this.birthday = birthday;
         this.number = number;
     }
-
+    
+    public Player(String urlPlayer, int non, String amplua){
+        this.urlPlayer = urlPlayer;
+        this.amplua = amplua;
+    }
+    
     public void setName(String name) {
         this.name = name;
     }
     
     public void setGames(int games) {
         this.games = games;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
     }
 
     public void setGoal(int goal) {
