@@ -40,10 +40,11 @@ public class Player {
         }
     }
     
-    public Player(String team, String name, String urlPlayer){
+    public Player(String team, String name, String urlPlayer, String birthday){
         this.team = team;
         this.name = name;
         this.urlPlayer = urlPlayer;
+        this.birthday = birthday;
     }
     
     public Player(String name, String team, String amplua, String birthday, int number) {
@@ -73,6 +74,10 @@ public class Player {
 
     public void setGoal(int goal) {
         this.goal = goal;
+    }
+
+    public void setAmplua(String amplua) {
+        this.amplua = amplua;
     }
 
     public void setAssist(int assist) {

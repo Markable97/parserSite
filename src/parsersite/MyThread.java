@@ -42,15 +42,13 @@ public class MyThread extends Thread {
     @Override
     public void run() {
        String nameAndDate = "", name = "", birthday = "";
+       boolean f = true;
        System.out.println("Поток:" + getName() + " запущен!!!!!!!!!!!!!!!!!!!!!!!!!");
        for(int i = start; i <= end; i++){
            try {
                //Document doc = Jsoup.connect(url + listId.get(i)).get();
                //Element titleName = doc.selectFirst("p.player_title_name");
-               nameAndDate = ParserSite.getPlayerFullNameAndDAta(url + listId.get(i));
-               name = ParserSite.returnStr(nameAndDate, 0); //Возвращает имя
-               birthday = ParserSite.replaceDateFormat(ParserSite.returnStr(nameAndDate,1)); //Возврат даты и сразу ее изменнеие в формат MySql
-               boolean f = true;
+               f = true;
                for(Match m : match){
                    ArrayList<Player> players;// = new ArrayList<>();
                    //players = m.getPlayers();
@@ -58,8 +56,17 @@ public class MyThread extends Thread {
                        players = m.getPlayers();
                        for(Player p : players){
                             if(p.getUrlPlayer().equals(listId.get(i))){
+                                //Найден игрок в матче 
+                                if (f==true){
+                                    //Нужно произвести парсинг
+                                    nameAndDate = ParserSite.getPlayerFullNameAndDAta(url + listId.get(i));
+                                    name = ParserSite.returnStr(nameAndDate, 0); //Возвращает имя
+                                    birthday = ParserSite.replaceDateFormat(ParserSite.returnStr(nameAndDate,1)); //Возврат даты и сразу ее изменнеие в формат MySql
+                                    listAllPlayers.add(new Player(p.getTeam(),name, p.getUrlPlayer(),birthday));
+                                    f=false;
+                                }
                                 p.setName(name);                                
-                                System.out.println("Поток:" + getName() + " игрок добавлен!!!!!!!!!!!!" + name);
+                                System.out.println("Поток:" + getName() + " игрок добавлен в матч++++++++++++" + name);
                                 for(Player e : listAllPlayers){
                                     if(e.getUrlPlayer().equals(listId.get(i))){
                                         e.setName(name);
@@ -68,20 +75,25 @@ public class MyThread extends Thread {
                                     }
                                 }
                                 //listAllPlayers.add(new Player(p.getTeam(),titleName.text(), p.getUrlPlayer()));
-                                f = false;
+                                //f = false;
                                 break;
                             }
                         }
                    }
-                   if(f == false){
-                       break;
-                   }
+                   /*if(f == false){
+                       break; //закомментировал, берется только один раз. но из-за того, что в список всех игркоов добавляется имя отрабатывает нормально
+                   }*/
                }
            } catch (IOException ex) {
                Logger.getLogger(MyThread.class.getName()).log(Level.SEVERE, null, ex);
            }
        }
-       System.out.println("**********************Потко: " + getName() + " закончен*************************");
+       if(f==true){
+           System.out.println("----------------------Потко: " + getName() + " закончен не было добавления--------------------------");
+       }else{
+           System.out.println("**********************Потко: " + getName() + " закончен*************************");
+       }
+       
     }
     
     
