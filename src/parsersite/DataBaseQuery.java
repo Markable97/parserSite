@@ -157,6 +157,7 @@ public class DataBaseQuery {
                         for(Player p_name : listPlayer){
                             
                             if(p_name.getUrlPlayer().equals(p.getUrlPlayer())){
+                                //Берется имя из списка всех игроков а не с главного массива
                                 procPlayerMatch.setString(4,p_name.getName());
                                 /*if(p.getName()!= null){
                                     //System.out.println("БИБО = " + p_name.getName());

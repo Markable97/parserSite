@@ -28,6 +28,7 @@ public class ParserSite {
     static ArrayList<String> urlList = new ArrayList<>();
     static ArrayList<Match> mainArray;
     static ArrayList<String> listIdPlayers  = new ArrayList<>();
+    static ArrayList<Player> listAllPlayerAmplua  = new ArrayList<>();
     static ArrayList<Club> clubs;
     
     /**
@@ -54,7 +55,7 @@ public class ParserSite {
         //ParserOtherDivs otherDivs = new ParserOtherDivs();
        // System.out.println(otherDivs.toString());
         String urls = urlDiva + "/tour";
-        for(int i = 1 ; i <= 21; i++){
+        for(int i = 21 ; i <= 21 ; i++){
             for(Match e :parsingPlayerInMatch(urls + i)){
                 mainArray.add(e);
             }
@@ -112,6 +113,14 @@ public class ParserSite {
             //отправка для вставки в бд
         }
         //listPlayer.remove(0);
+        for(int i = 0; i < listPlayer.size(); i++){
+            for(int j = 0; j < listAllPlayerAmplua.size(); j++){
+                if(listPlayer.get(i).getUrlPlayer().equals(listAllPlayerAmplua.get(j).getUrlPlayer())){
+                    listPlayer.get(i).setAmplua(listAllPlayerAmplua.get(j).getAmplua());
+                    break;
+                }
+            }
+        }
         System.out.println(mainArray.toString());
         System.out.println(listPlayer.toString());
         System.exit(0);
@@ -208,7 +217,7 @@ public class ParserSite {
                             //plOneMatch.add(new Player(nameHome, replaceName(s.text())));
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                            //addIdPlayer(a.attr("href"));
+                            addIdPlayer(a.attr("href"));
                         }
                         p = ps.get(4);
                         data = p.select("span");
@@ -217,7 +226,7 @@ public class ParserSite {
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                            //addIdPlayer(a.attr("href"));
+                            addIdPlayer(a.attr("href"));
                         }
                         System.out.println("\n" + nameGuest);
                         p = ps.get(7);
@@ -227,7 +236,7 @@ public class ParserSite {
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                            //addIdPlayer(a.attr("href"));
+                            addIdPlayer(a.attr("href"));
                         }
                         p = ps.get(9);
                         data = p.select("span");
@@ -236,7 +245,7 @@ public class ParserSite {
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                            //addIdPlayer(a.attr("href"));
+                            addIdPlayer(a.attr("href"));
                         }
                     }else{
                         //если кол-во спан другое, то порядок записей другой
@@ -252,7 +261,7 @@ public class ParserSite {
                                     for(Element s : data){
                                         Element a = s.selectFirst("a");
                                         plOneMatch.add(new Player(nameHome,/*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                                        //addIdPlayer(a.attr("href"));
+                                        addIdPlayer(a.attr("href"));
                                     }
                                     Element pSquadReserve = pSquadMain.nextElementSibling();
                                     if(pSquadReserve.text().equals("Запасные:")){
@@ -260,7 +269,7 @@ public class ParserSite {
                                         for(Element s : data){
                                             Element a = s.selectFirst("a");
                                             plOneMatch.add(new Player(nameHome,/*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                                            //addIdPlayer(a.attr("href"));
+                                            addIdPlayer(a.attr("href"));
                                         }
                                     }
                                 }
@@ -273,7 +282,7 @@ public class ParserSite {
                                     for(Element s : data){
                                         Element a = s.selectFirst("a");
                                         plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                                        //addIdPlayer(a.attr("href"));
+                                        addIdPlayer(a.attr("href"));
                                     }
                                     Element pName = pSquadMain.nextElementSibling();
                                     if(pName != null && pName.text().equals("Запасные:")){//если след тег ЗАпасные то берем след тег с составом
@@ -282,7 +291,7 @@ public class ParserSite {
                                         for(Element s : data){
                                             Element a = s.selectFirst("a");
                                             plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                                            //addIdPlayer(a.attr("href"));
+                                            addIdPlayer(a.attr("href"));
                                         }
                                     }
                                 }
@@ -445,7 +454,7 @@ public class ParserSite {
                             //System.out.print(replaceName(s.text()) + " " );
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                            //addIdPlayer(a.attr("href"));
+                            addIdPlayer(a.attr("href"));
                         }
                         p = ps.get(4);
                         data = p.select("span");
@@ -454,7 +463,7 @@ public class ParserSite {
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
                              plOneMatch.add(new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                             //addIdPlayer(a.attr("href"));
+                             addIdPlayer(a.attr("href"));
                         }
                         System.out.println("\n" + nameGuest);
                         p = ps.get(7);
@@ -464,7 +473,7 @@ public class ParserSite {
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                            //addIdPlayer(a.attr("href"));
+                            addIdPlayer(a.attr("href"));
                         }
                         p = ps.get(9);
                         data = p.select("span");
@@ -473,7 +482,7 @@ public class ParserSite {
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
                             plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                            //addIdPlayer(a.attr("href"));
+                            addIdPlayer(a.attr("href"));
                         }
                     }else{
                         //если кол-во спан другое, то порядок записей другой
@@ -670,8 +679,8 @@ public class ParserSite {
             Element span = td.selectFirst("span.amplua");
             amplua = span.text();
             System.out.println(" Name = " + name + " Url = " + urlPlayer + " Date = " + birthday + " Amplua =  " + amplua);
-            listIdPlayers.add(urlPlayer);
-            listPlayer.add(new Player(urlPlayer, 0, amplua));
+            //listIdPlayers.add(urlPlayer);
+            listAllPlayerAmplua.add(new Player(urlPlayer, 0, amplua));
         }
         
     }
