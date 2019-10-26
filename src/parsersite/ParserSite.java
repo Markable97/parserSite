@@ -22,9 +22,9 @@ public class ParserSite {
 
     static ArrayList<Player> listPlayer = new ArrayList<>();
     //static String url = "http://lfl.ru/club2668/players_list"; //ссылка на список игркоов команды 
-    static String urlDiva = "http://lfl.ru/tournament4341"; //ссылка на список игркоов команды 
-    static String urlDivTable  = "http://lfl.ru/?ajax=1&method=tournament_stats_table&tournament_id=4341"; //табблица ajax дивизиона
-    static String squadTable = "http://lfl.ru/?ajax=1&method=tournament_squads_table&tournament_id=4341&club_id="; //таблица состава с статистикой
+    static String urlDiva = "http://lfl.ru/tournament5231"; //ссылка на список игркоов команды 
+    static String urlDivTable  = "http://lfl.ru/?ajax=1&method=tournament_stats_table&tournament_id=5231"; //табблица ajax дивизиона
+    static String squadTable = "http://lfl.ru/?ajax=1&method=tournament_squads_table&tournament_id=5231&club_id="; //таблица состава с статистикой
     static ArrayList<String> urlList = new ArrayList<>();
     static ArrayList<Match> mainArray;
     static ArrayList<String> listIdPlayers  = new ArrayList<>();
@@ -37,33 +37,33 @@ public class ParserSite {
     public static void main(String[] args) throws IOException, InterruptedException {
         System.out.println("Начало парсинга");
         /*Вытаскивает id команд*/
-        Document dc = Jsoup.connect(urlDivTable).get();
+        /*Document dc = Jsoup.connect(urlDivTable).get();
         Element table = dc.select("table").first();
         Element tbody = table.selectFirst("tbody");
         Elements urlTeam = tbody.select("td.left_align_table > a");
         for(Element e : urlTeam){
-        String url = getTeamId(e.attr("href"));
-        urlList.add(url);
+            String url = getTeamId(e.attr("href"));
+            urlList.add(url);
         }
         System.out.println(urlList.toString());
         //Перелаем id и вытаскивание всех игркоов
         for(String s : urlList){
             parsingNewInfoPlayer(squadTable + s);
         }
-        System.out.println("Проверка = " + listPlayer.size() + " = " + listIdPlayers.size());
-        mainArray = new ArrayList<>();
-        //ParserOtherDivs otherDivs = new ParserOtherDivs();
-       // System.out.println(otherDivs.toString());
-        String urls = urlDiva + "/tour";
-        for(int i = 21 ; i <= 21 ; i++){
+        System.out.println(listAllPlayerAmplua);
+        mainArray = new ArrayList<>();*/
+        ParserOtherDivs otherDivs = new ParserOtherDivs();
+        //System.out.println(otherDivs.toString());
+        /*String urls = urlDiva + "/tour";
+        for(int i = 0 ; i < 1 ; i++){
             for(Match e :parsingPlayerInMatch(urls + i)){
                 mainArray.add(e);
             }
             System.out.println("\t\nРазмер главного массива" + mainArray.size());
-        }
+        }*/
         //System.out.println(mainArray.toString());
-        System.out.println("Всего игроков = " + listIdPlayers.size());
-        MyThread t = null;
+        //System.out.println("Всего игроков = " + listIdPlayers.size());
+        /*MyThread t = null;
         for(int i = 0; i < listIdPlayers.size(); i++){
             Thread.sleep(1200);
             t = new MyThread("Поток " + i,mainArray, listIdPlayers, i, i,listPlayer);
@@ -74,21 +74,6 @@ public class ParserSite {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        //if(t.isAlive()) t.join();
-        /*MyThread t = new MyThread("Поток JOPA", mainArray, listIdPlayers, 200, listIdPlayers.size());;
-        
-        MyThread Pupa = new MyThread("1111111111", mainArray, listIdPlayers, 0, 50);
-        MyThread Xupa = new MyThread("2222222222", mainArray, listIdPlayers, 50, 100);
-        MyThread Lupa = new MyThread("3333333333", mainArray, listIdPlayers, 100, 200);
-        
-        try {
-            if(t.isAlive()) t.join();
-            if(Pupa.isAlive()) Pupa.join();
-            if(Xupa.isAlive()) Xupa.join();
-            if(Lupa.isAlive()) Lupa.join();
-        } catch (InterruptedException ex) {
-           System.out.println(ex);
-        }*/
         Thread.sleep(5000);
         if(t.isAlive()){
             System.out.println("Поток жив");
@@ -111,9 +96,9 @@ public class ParserSite {
             }*/
             //listPlayer.remove(0);
             //отправка для вставки в бд
-        }
+        //}
         //listPlayer.remove(0);
-        for(int i = 0; i < listPlayer.size(); i++){
+        /*for(int i = 0; i < listPlayer.size(); i++){
             for(int j = 0; j < listAllPlayerAmplua.size(); j++){
                 if(listPlayer.get(i).getUrlPlayer().equals(listAllPlayerAmplua.get(j).getUrlPlayer())){
                     listPlayer.get(i).setAmplua(listAllPlayerAmplua.get(j).getAmplua());
@@ -123,8 +108,8 @@ public class ParserSite {
         }
         System.out.println(mainArray.toString());
         System.out.println(listPlayer.toString());
-        System.exit(0);
-        DataBaseQuery baseQuery = new DataBaseQuery(listPlayer,mainArray);
+        System.exit(0);*/
+        //DataBaseQuery baseQuery = new DataBaseQuery(listPlayer,mainArray);
         //DataBaseQuery insertInBD = new DataBaseQuery(mainArray); //отправка для вставки в бд
         //наччало отправки всех данных в БД. Можно сделать потоки для каждого дивизиона для ускорения выгрузки
         /*Document docTournament = Jsoup.connect(urlDiva).get();

@@ -29,15 +29,16 @@ public class ParserOtherDivs {
     String url; //ссылка на тур
     private ArrayList<Match> matches; //ArrayList класса Match, для сохранения матчей (его будем возвращать в главный метод)
     private ArrayList<Player> players; //ArrayList для игроков в матче и их действие (для передачи в matches)
-    //твои переменные броха 
+//твои переменные броха 
     public ParserOtherDivs() throws IOException {
         //this.url = "http://lfl.ru/tournament4342/tour6";
-        this.url = "http://lfl.ru/tournament4342/tour";
+        this.url = "http://lfl.ru/tournament5233/tour";
         players = new ArrayList<>();
         matches = new ArrayList<>();
-        for(int i = 21; i < 22; i++){
+        for(int i = 1; i < 2; i++){
             mainParserDivs(url + i);
         }
+        System.out.println(matches.toString());
         DataBaseQuery baseQuery = new DataBaseQuery(matches);
         
     }
@@ -50,7 +51,7 @@ public class ParserOtherDivs {
         }
     }
     
-    private void parsResults(Element some_news){
+    private void parsResults(Element some_news) throws IOException{
         //это твое бро. Нудно вытащить название команд, дивизион, тур, дата, стадион, судью
         //Если есть перенос вытащить и чей пернос также как и отображается на сайте
         String nameHome, nameGuest, dateMatch = "", referee = "", stadium = "", division = "", matchTransfer = "Перенос";
@@ -144,16 +145,27 @@ public class ParserOtherDivs {
         
     }
     
-    private ArrayList<Player> parseSquad(Element divRight , String nameHome, String nameGuest){
+    private String returnUrlPerson(String url) throws IOException{
+        Document doc = Jsoup.connect("http://lfl.ru"+url).get();
+        Element p = doc.select("p.player_title_name").first();
+        return p.getElementsByTag("a").attr("href");
+    }
+    
+    private ArrayList<Player> parseSquad(Element divRight , String nameHome, String nameGuest) throws IOException{
             //проход по сосставу на матч
         players.clear();//очистка перед каждым проходом по составам 
         ArrayList<Player> plOnMatch = new ArrayList<>();
+        ArrayList<Player> playerUrls = new ArrayList<>();
         plOnMatch = players;
         Elements p = divRight.select("p.match_right_head");
         for(int i = 0; i < p.size(); i++){
             String str = p.get(i).text();
             if(str.equals("Составы:")){
                 Element div = p.get(i).nextElementSibling();//div блок с составом
+                Elements spans = div.select("span");
+                for(Element s : spans){
+                    playerUrls.add(new Player(0,replaceName(s.text().replace(";", "").trim()),s.getElementsByTag("a").attr("href")));
+                }
                 String[] arraySquad = div.text().split(";"); //разбивка сплошного тексат через ;
                 String team = nameHome; //для запсии команды в класс
                 for(int j = 0; j <  arraySquad.length; j++){
@@ -162,6 +174,16 @@ public class ParserOtherDivs {
                     }
                     arraySquad[j] = arraySquad[j].replace(team + " ", "");
                     plOnMatch.add(new Player(team, replaceName(arraySquad[j])));
+                }
+            }
+        }
+        
+        //System.out.println("\nПроверка ссылок:" + playerUrls.toString());
+        for(Player player : plOnMatch){
+            for(Player urls : playerUrls){
+                if(player.getName().equals(urls.getName())){
+                    player.urlPlayer = returnUrlPerson(urls.getUrlPlayer());
+                    break;
                 }
             }
         }

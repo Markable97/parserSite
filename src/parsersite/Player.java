@@ -31,6 +31,11 @@ public class Player {
         this.name = name;
     }
     
+    public Player(int i, String name, String url){
+        this.name  = name;
+        this.urlPlayer = url;
+    }
+    
     public Player(String team, String name){
         this.team = team;
         if(name.startsWith("/player")){
