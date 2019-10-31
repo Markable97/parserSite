@@ -22,11 +22,11 @@ public class ParserSite {
 
     static ArrayList<Player> listPlayer = new ArrayList<>();
     //static String url = "http://lfl.ru/club2668/players_list"; //ссылка на список игркоов команды 
-    static String urlDiva = "http://lfl.ru/tournament5231"; //ссылка на список игркоов команды 
+    static String urlDiva = "http://lfl.ru/division543/tour1"; //ссылка на список игркоов команды 
     static String urlDivTable  = "http://lfl.ru/?ajax=1&method=tournament_stats_table&tournament_id=5231"; //табблица ajax дивизиона
     static String squadTable = "http://lfl.ru/?ajax=1&method=tournament_squads_table&tournament_id=5231&club_id="; //таблица состава с статистикой
     static ArrayList<String> urlList = new ArrayList<>();
-    static ArrayList<Match> mainArray;
+    static ArrayList<Match> mainArray = new ArrayList<>();
     static ArrayList<String> listIdPlayers  = new ArrayList<>();
     static ArrayList<Player> listAllPlayerAmplua  = new ArrayList<>();
     static ArrayList<Club> clubs;
@@ -55,13 +55,15 @@ public class ParserSite {
         ParserOtherDivs otherDivs = new ParserOtherDivs();
         //System.out.println(otherDivs.toString());
         /*String urls = urlDiva + "/tour";
-        for(int i = 0 ; i < 1 ; i++){
-            for(Match e :parsingPlayerInMatch(urls + i)){
+        for(int i = 1 ; i < 2 ; i++){
+            ArrayList<Match> m = parsingPlayerInMatch(urls);
+            for(Match e : m){
                 mainArray.add(e);
             }
+            //mainArray = parsingPlayerInMatch(urls );
             System.out.println("\t\nРазмер главного массива" + mainArray.size());
-        }*/
-        //System.out.println(mainArray.toString());
+        }
+        System.out.println(mainArray.toString());*/
         //System.out.println("Всего игроков = " + listIdPlayers.size());
         /*MyThread t = null;
         for(int i = 0; i < listIdPlayers.size(); i++){
@@ -109,7 +111,7 @@ public class ParserSite {
         System.out.println(mainArray.toString());
         System.out.println(listPlayer.toString());
         System.exit(0);*/
-        //DataBaseQuery baseQuery = new DataBaseQuery(listPlayer,mainArray);
+        //DataBaseQuery baseQuery = new DataBaseQuery(mainArray);
         //DataBaseQuery insertInBD = new DataBaseQuery(mainArray); //отправка для вставки в бд
         //наччало отправки всех данных в БД. Можно сделать потоки для каждого дивизиона для ускорения выгрузки
         /*Document docTournament = Jsoup.connect(urlDiva).get();
@@ -131,7 +133,8 @@ public class ParserSite {
         int goalHome, goalGuest, tour = 0;
         int numberMatch = 0; 
         //Document doc = Jsoup.connect(urlDiva+"/tour1?").get();
-        Document doc = Jsoup.connect(url).get();
+        File input = new File("C:\\Users\\march\\OneDrive\\Рабочий стол\\lfl.ru.html");
+        Document doc = Jsoup.parse(input, "windows-1251");
         Elements divs = doc.select("div.some_news");
         ArrayList<Match> matches = new ArrayList<>(); //список матчей
         ArrayList <Player> plOneMatch = new ArrayList<>();
@@ -201,7 +204,9 @@ public class ParserSite {
                             //System.out.print(replaceName(s.text()) + " " );
                             //plOneMatch.add(new Player(nameHome, replaceName(s.text())));
                             Element a = s.selectFirst("a");
-                            plOneMatch.add(new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                            Player pl = new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href"));
+                            pl.setName(replaceName(s.text()));
+                            plOneMatch.add(pl);
                             addIdPlayer(a.attr("href"));
                         }
                         p = ps.get(4);
@@ -210,7 +215,9 @@ public class ParserSite {
                         for(Element s : data){
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
-                            plOneMatch.add(new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                            Player pl = new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href"));
+                            pl.setName(replaceName(s.text()));
+                            plOneMatch.add(pl);
                             addIdPlayer(a.attr("href"));
                         }
                         System.out.println("\n" + nameGuest);
@@ -220,7 +227,9 @@ public class ParserSite {
                         for(Element s : data){
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
-                            plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                            Player pl = new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href"));
+                            pl.setName(replaceName(s.text()));
+                            plOneMatch.add(pl);
                             addIdPlayer(a.attr("href"));
                         }
                         p = ps.get(9);
@@ -229,7 +238,9 @@ public class ParserSite {
                         for(Element s : data){
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
-                            plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                            Player pl = new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href"));
+                            pl.setName(replaceName(s.text()));
+                            plOneMatch.add(pl);
                             addIdPlayer(a.attr("href"));
                         }
                     }else{
@@ -245,7 +256,9 @@ public class ParserSite {
                                     data = pSquadMain.select("span");
                                     for(Element s : data){
                                         Element a = s.selectFirst("a");
-                                        plOneMatch.add(new Player(nameHome,/*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                                        Player pl = new Player(nameHome,/*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href"));
+                                        pl.setName(replaceName(s.text()));
+                                        plOneMatch.add(pl);
                                         addIdPlayer(a.attr("href"));
                                     }
                                     Element pSquadReserve = pSquadMain.nextElementSibling();
@@ -253,7 +266,9 @@ public class ParserSite {
                                         data = pSquadReserve.select("span");
                                         for(Element s : data){
                                             Element a = s.selectFirst("a");
-                                            plOneMatch.add(new Player(nameHome,/*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                                            Player pl = new Player(nameHome,/*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href"));
+                                            pl.setName(replaceName(s.text()));
+                                            plOneMatch.add(pl);
                                             addIdPlayer(a.attr("href"));
                                         }
                                     }
@@ -266,7 +281,9 @@ public class ParserSite {
                                     data = pSquadMain.select("span");
                                     for(Element s : data){
                                         Element a = s.selectFirst("a");
-                                        plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                                        Player pl = new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href"));
+                                        pl.setName(replaceName(s.text()));
+                                        plOneMatch.add(pl);
                                         addIdPlayer(a.attr("href"));
                                     }
                                     Element pName = pSquadMain.nextElementSibling();
@@ -275,7 +292,9 @@ public class ParserSite {
                                         data = pSquadReserve.select("span");
                                         for(Element s : data){
                                             Element a = s.selectFirst("a");
-                                            plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                                            Player pl = new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href"));
+                                            pl.setName(replaceName(s.text()));
+                                            plOneMatch.add(pl);
                                             addIdPlayer(a.attr("href"));
                                         }
                                     }
@@ -350,7 +369,7 @@ public class ParserSite {
                             String playerName = replaceName(link.text());
                             String nameImage = link.select("img").attr("src");
                             String[] ch = span.text().split(",");
-                            if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
+                            if(nameImage.equals("./lfl.ru_files/popup_yc.png") || nameImage.equals("./lfl.ru_files/popup_2yc.png")){
                                 //Если желтая карточка
                                 for(int i = 0; i < plOneMatch.size(); i++){
                                     if(playerNameUrl.equals(plOneMatch.get(i).getUrlPlayer())){
@@ -360,7 +379,7 @@ public class ParserSite {
                                         plOneMatch.get(i).setArticle(article + ";" + (ch[1]).trim());
                                     }
                                 }
-                            }else if(nameImage.equals("/theme/img/popup_rc.png")){
+                            }else if(nameImage.equals("./lfl.ru_files/popup_rc.png")){
                                 for(int i = 0; i < plOneMatch.size(); i++){
                                     if(playerNameUrl.equals(plOneMatch.get(i).getUrlPlayer())){
                                         String article = plOneMatch.get(i).getArticle();
@@ -388,7 +407,7 @@ public class ParserSite {
                             String playerName = replaceName(link.text());
                             String nameImage = link.select("img").attr("src");
                             String[] ch = span.text().split(",");
-                            if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
+                            if(nameImage.equals("./lfl.ru_files/popup_yc.png") || nameImage.equals("./lfl.ru_files/popup_2yc.png")){
                                 //Если желтая карточка
                                 for(int i = 0; i < plOneMatch.size(); i++){
                                     if(playerNameUrl.equals(plOneMatch.get(i).getUrlPlayer())){
@@ -398,7 +417,7 @@ public class ParserSite {
                                         plOneMatch.get(i).setArticle(article + ";" + (ch[1]).trim());
                                     }
                                 }
-                            }else if(nameImage.equals("/theme/img/popup_rc.png")){
+                            }else if(nameImage.equals("./lfl.ru_files/popup_rc.png")){
                                 for(int i = 0; i < plOneMatch.size(); i++){
                                     if(playerNameUrl.equals(plOneMatch.get(i).getUrlPlayer())){
                                         String article = plOneMatch.get(i).getArticle();
@@ -438,7 +457,9 @@ public class ParserSite {
                         for(Element s : data){
                             //System.out.print(replaceName(s.text()) + " " );
                             Element a = s.selectFirst("a");
-                            plOneMatch.add(new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                            Player pl = new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href"));
+                            pl.setName(replaceName(s.text()));
+                            plOneMatch.add(pl);
                             addIdPlayer(a.attr("href"));
                         }
                         p = ps.get(4);
@@ -447,8 +468,10 @@ public class ParserSite {
                         for(Element s : data){
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
-                             plOneMatch.add(new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
-                             addIdPlayer(a.attr("href"));
+                            Player pl = new Player(nameHome, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href"));
+                            pl.setName(replaceName(s.text()));
+                            plOneMatch.add(pl);
+                            addIdPlayer(a.attr("href"));
                         }
                         System.out.println("\n" + nameGuest);
                         p = ps.get(7);
@@ -457,7 +480,9 @@ public class ParserSite {
                         for(Element s : data){
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
-                            plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                            Player pl = new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href"));
+                            pl.setName(replaceName(s.text()));
+                            plOneMatch.add(pl);
                             addIdPlayer(a.attr("href"));
                         }
                         p = ps.get(9);
@@ -466,7 +491,9 @@ public class ParserSite {
                         for(Element s : data){
                             //System.out.print( replaceName(s.text()) + " ");
                             Element a = s.selectFirst("a");
-                            plOneMatch.add(new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href")));
+                            Player pl = new Player(nameGuest, /*getPlayerFullName(a.attr("abs:href")),*/ a.attr("href"));
+                            pl.setName(replaceName(s.text()));
+                            plOneMatch.add(pl);
                             addIdPlayer(a.attr("href"));
                         }
                     }else{
@@ -539,7 +566,7 @@ public class ParserSite {
                             String playerName = replaceName(link.text());
                             String nameImage = link.select("img").attr("src");
                             String[] ch = span.text().split(",");
-                            if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
+                            if(nameImage.equals("./lfl.ru_files/popup_yc.png") || nameImage.equals("./lfl.ru_files/popup_2yc.png")){
                                 //Если желтая карточка
                                 for(int i = 0; i < plOneMatch.size(); i++){
                                     if(playerNameUrl.equals(plOneMatch.get(i).getUrlPlayer())){
@@ -549,7 +576,7 @@ public class ParserSite {
                                         plOneMatch.get(i).setArticle(article + ";" + (ch[1]).trim() + ";");
                                     }
                                 }
-                            }else if(nameImage.equals("/theme/img/popup_rc.png")){
+                            }else if(nameImage.equals("./lfl.ru_files/popup_rc.png")){
                                 for(int i = 0; i < plOneMatch.size(); i++){
                                     if(playerNameUrl.equals(plOneMatch.get(i).getUrlPlayer())){
                                         String article = plOneMatch.get(i).getArticle();
@@ -577,7 +604,7 @@ public class ParserSite {
                             String playerName = replaceName(link.text());
                             String nameImage = link.select("img").attr("src");
                             String[] ch = span.text().split(",");
-                            if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
+                            if(nameImage.equals("./lfl.ru_files/popup_yc.png") || nameImage.equals("./lfl.ru_files/popup_2yc.png")){
                                 //Если желтая карточка
                                 for(int i = 0; i < plOneMatch.size(); i++){
                                     if(playerNameUrl.equals(plOneMatch.get(i).getUrlPlayer())){
@@ -587,7 +614,7 @@ public class ParserSite {
                                         plOneMatch.get(i).setArticle(article + ";" + (ch[1]).trim());
                                     }
                                 }
-                            }else if(nameImage.equals("/theme/img/popup_rc.png")){
+                            }else if(nameImage.equals("./lfl.ru_files/popup_rc.png")){
                                 for(int i = 0; i < plOneMatch.size(); i++){
                                     if(playerNameUrl.equals(plOneMatch.get(i).getUrlPlayer())){
                                         String article = plOneMatch.get(i).getArticle();

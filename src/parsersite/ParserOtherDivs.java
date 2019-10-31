@@ -6,6 +6,7 @@
 //класс для парсинга результатов матча и дейсвтий игроков всех дивизионов кроме первого
 package parsersite;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.jsoup.Jsoup;
@@ -32,7 +33,7 @@ public class ParserOtherDivs {
 //твои переменные броха 
     public ParserOtherDivs() throws IOException {
         //this.url = "http://lfl.ru/tournament4342/tour6";
-        this.url = "http://lfl.ru/tournament5233/tour";
+        this.url = "http://lfl.ru/tournament5231/tour";
         players = new ArrayList<>();
         matches = new ArrayList<>();
         for(int i = 1; i < 2; i++){
@@ -44,7 +45,9 @@ public class ParserOtherDivs {
     }
     
     private void mainParserDivs(String url) throws IOException{
-        Document doc = Jsoup.connect(url).get();
+        File input = new File("C:\\Users\\march\\OneDrive\\Рабочий стол\\lfl.ru.html");
+        Document doc = Jsoup.parse(input, "windows-1251");
+        //Document doc = Jsoup.connect(url).get();
         Elements divMatches = doc.select("div.some_news");
         for(Element e : divMatches){
             parsResults(e);
@@ -182,7 +185,7 @@ public class ParserOtherDivs {
         for(Player player : plOnMatch){
             for(Player urls : playerUrls){
                 if(player.getName().equals(urls.getName())){
-                    player.urlPlayer = returnUrlPerson(urls.getUrlPlayer());
+                    player.urlPlayer = urls.getUrlPlayer();//returnUrlPerson(urls.getUrlPlayer());
                     break;
                 }
             }
@@ -248,13 +251,13 @@ public class ParserOtherDivs {
                     Element link = span.selectFirst("a");
                     String playerName = replaceName(link.text());
                     String nameImage = link.select("img").attr("src");
-                    if(nameImage.equals("/theme/img/popup_yc.png") || nameImage.equals("/theme/img/popup_2yc.png")){
+                    if(nameImage.equals("./lfl.ru_files/popup_yc.png") || nameImage.equals("./lfl.ru_files/popup_2yc.png")){
                         Player pl = findPlayer(players,playerName);
                         if(pl != null){//костыль из-за Зари (Колхоза)
                             int yellow = pl.getYellow();
                             pl.setYellow(++yellow);                            
                         }
-                    }else if(nameImage.equals("/theme/img/popup_rc.png")){
+                    }else if(nameImage.equals("./lfl.ru_files/popup_rc.png")){
                         Player pl = findPlayer(players,playerName);
                         if(pl != null){
                             int red = pl.getRed();
@@ -287,7 +290,7 @@ public class ParserOtherDivs {
     }
     
     private int activePlayet(String str){
-        str = str.replace("Восток","").trim();
+            str = str.replace("Восток","").trim();
         String[] s = str.split(" ");
         //System.out.println("Ghtttttt = " + s[2]);
         String ss = s[2].replaceAll("[(|)]+", "");
@@ -296,7 +299,7 @@ public class ParserOtherDivs {
     }
     
     private String replaceName(String str){
-        str = str.replace("Восток","").trim();
+            str = str.replace("Восток","").trim();
         if(str.contains("(вр)")){
             str = str.replace("(вр)", "");
         }

@@ -23,7 +23,7 @@ public class DataBaseQuery {
     
     private static String user = "root";
     private static String password = "7913194";
-    private static String url = "jdbc:mysql://localhost:3306/football_main_work";
+    private static String url = "jdbc:mysql://localhost:3306/football_main_realese";
     
     private static String sqlInserClub = "insert into teams\n" +
                 "set id_division = ?, team_name = ?, logo = ?;";
@@ -52,8 +52,8 @@ public class DataBaseQuery {
 "    id_referee = (select id_staff from staff where staff_name like ?),\n" +
 "    transfer = ?;";//sql для вставки в таблицу match
     
-    private static String SqlUpdateMatch = ""
-            + " update matches "
+    /*private static String SqlUpdateMatch = ""
+            + " insert into matches "
             + " set "
             + " goal_home = ?, "
             + " goal_guest = ?, "
@@ -61,8 +61,19 @@ public class DataBaseQuery {
             + " transfer = ?"
             + " where team_home = (select id_team from teams where team_name = change_team_name(?) )"
             + " and team_guest = (select id_team from teams where team_name = change_team_name(?) )"
-            + " and id_tour = ?;";
-    
+            + " and id_tour = ?;";*/
+        private static String SqlUpdateMatch = ""
+            + " insert into matches "
+            + " set id_season = 4, "
+            + " goal_home = ?, "
+            + " goal_guest = ?, "
+            + " id_referee = (select id_staff from staff where staff_name like ?), "
+            + " transfer = ?, "
+            + " team_home = (select id_team from teams where team_name = change_team_name(?) ), "
+            + " team_guest = (select id_team from teams where team_name = change_team_name(?) ), "
+            + " id_tour = ?,"
+            + " id_division = (select id_division from divisions where name_division = ?), "
+            + " played = ?;";
     private static String sqlInsertPlayerInMatch = "insert into players_in_match\n" +
 "set id_match = (select id_match from v_matches\n" +
 "				where team_home like ? and team_guest like ? and id_tour = ?),\n" +
@@ -74,7 +85,7 @@ public class DataBaseQuery {
                                             "set id_staff = ?,\n" +
                                             "staff_name = ?;";
     private static String sqlProcInsertStaff = "CALL insertStaff(?);";
-    private static String sqlPocPlayerInMatche = "CALL insPlayerInMatche2(?,?,?,?,?,?,?,?,?,?,?,?,?);";
+    private static String sqlPocPlayerInMatche = "CALL insPlayerInMatche2(?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
     
     private static PreparedStatement insertPlayer;
     
@@ -133,9 +144,15 @@ public class DataBaseQuery {
                 insertMatch.setString(5, m.getTeamHome());
                 insertMatch.setString(6, m.getTeamGuest());
                 insertMatch.setInt(7, m.getTour());
+                insertMatch.setString(8, "Третий дивизион B"/*m.getDivision()*/);
+                if(m.getReferee() != null){
+                    insertMatch.setInt(9, 1);
+                }else{
+                    insertMatch.setInt(9, 0);
+                }
                 try{
                     insertMatch.executeUpdate();
-                    System.out.println("\n\n\ncomplete = " + m.getTour() + " " + m.getTeamHome() + " " +  m.getTeamGuest());
+                    System.out.println("\ncomplete = " + m.getTour() + " " + m.getTeamHome() + " " +  m.getTeamGuest());
                 }catch(SQLException ex){
                     System.out.println("EROOOOOOOOOR!!! МАТЧ\n" + ex);
                     //continue;
@@ -156,6 +173,7 @@ public class DataBaseQuery {
                         procPlayerMatch.setInt(11, p.getPenaltyOut());
                         procPlayerMatch.setInt(12, p.getOwnGoal());
                         procPlayerMatch.setString(13, p.getUrlPlayer());
+                        procPlayerMatch.setString(14, p.getTeam());
                         try{
                             procPlayerMatch.execute();
                              System.out.println("Игрок добавлен = " + p.getName() + " " +  p.getUrlPlayer()+ " " + p.getTeam());

@@ -38,7 +38,7 @@ public class Player {
     
     public Player(String team, String name){
         this.team = team;
-        if(name.startsWith("/player")){
+        if(name.startsWith("http://lfl.ru/")){
             this.urlPlayer = name;
         }else{
             this.name = name;
