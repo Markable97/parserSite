@@ -51,7 +51,16 @@ public class DataBaseQuery {
 "	m_date = ?, id_stadium = (select id_stadium from stadiums where name_stadium like ?),\n" +
 "    id_referee = (select id_staff from staff where staff_name like ?),\n" +
 "    transfer = ?;";//sql для вставки в таблицу match
-    
+    private static String sqlInsertMatchSchedule = " "
+            + "insert into matches "
+            + "set id_season = 4,"
+            + " id_tour = ?, "
+            + " id_division = (select id_division from divisions where name_division = ?), "
+            + " team_home = (select id_team from teams where team_name = change_team_name(?) ), "
+            + " team_guest = (select id_team from teams where team_name = change_team_name(?) ), "
+            + " m_date = ?, "
+            + " id_stadium = (select id_stadium from stadiums where name_stadium like ?), "
+            + " transfer = ?;";
     /*private static String SqlUpdateMatch = ""
             + " insert into matches "
             + " set "
@@ -112,7 +121,8 @@ public class DataBaseQuery {
     public DataBaseQuery(ArrayList<Match> matches){
         this.matches = matches;
         //connection_two(matches);
-        addResult(matches);
+        //addResult(matches);
+        addSchedule(matches);
     }
 
     public DataBaseQuery(ArrayList<Player> player,ArrayList<Match> matches){
@@ -121,7 +131,35 @@ public class DataBaseQuery {
             connection(listPlayer, null);
             //connection(this.matches);
             }
-    
+    private static void addSchedule(ArrayList<Match> matches){
+        try{
+           connect = DriverManager.getConnection(url, user, password);
+           insertMatch = connect.prepareStatement(sqlInsertMatchSchedule);
+           for(Match m : matches){
+               System.out.println("Матч для добавения = " + m.getTeamHome() + " " + m.getTeamGuest());
+                insertMatch.setInt(1, m.getTour());
+                insertMatch.setString(2, "Третий дивизион B"/*m.getDivision()*/);
+                insertMatch.setString(3, m.getTeamHome());
+                insertMatch.setString(4, m.getTeamGuest());
+                if(m.getDateMatch().equals("- -")){
+                    insertMatch.setString(5, null);
+                }else{
+                    insertMatch.setString(5, m.getDateMatch());
+                }
+                insertMatch.setString(6, m.getStadium());
+                insertMatch.setString(7, m.getMatchTransfer());
+                try{
+                    insertMatch.executeUpdate();
+                    System.out.println("\ncomplete = " + m.getTour() + " " + m.getTeamHome() + " " +  m.getTeamGuest());
+                }catch(SQLException ex){
+                    System.out.println("EROOOOOOOOOR!!! МАТЧ\n" + ex);
+                    //continue;
+                }
+           }
+        }catch (SQLException ex) {
+            Logger.getLogger(DataBaseQuery.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     private static void addResult(ArrayList<Match> matches){
         try {
             connect = DriverManager.getConnection(url, user, password);

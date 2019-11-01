@@ -52,9 +52,9 @@ public class ParserSite {
         }
         System.out.println(listAllPlayerAmplua);
         mainArray = new ArrayList<>();*/
-        ParserOtherDivs otherDivs = new ParserOtherDivs();
+        //ParserOtherDivs otherDivs = new ParserOtherDivs();
         //System.out.println(otherDivs.toString());
-        /*String urls = urlDiva + "/tour";
+        String urls = urlDiva + "/tour";
         for(int i = 1 ; i < 2 ; i++){
             ArrayList<Match> m = parsingPlayerInMatch(urls);
             for(Match e : m){
@@ -63,7 +63,7 @@ public class ParserSite {
             //mainArray = parsingPlayerInMatch(urls );
             System.out.println("\t\nРазмер главного массива" + mainArray.size());
         }
-        System.out.println(mainArray.toString());*/
+        System.out.println(mainArray.toString());
         //System.out.println("Всего игроков = " + listIdPlayers.size());
         /*MyThread t = null;
         for(int i = 0; i < listIdPlayers.size(); i++){
@@ -111,7 +111,8 @@ public class ParserSite {
         System.out.println(mainArray.toString());
         System.out.println(listPlayer.toString());
         System.exit(0);*/
-        //DataBaseQuery baseQuery = new DataBaseQuery(mainArray);
+        //Результаты
+        DataBaseQuery baseQuery = new DataBaseQuery(mainArray);
         //DataBaseQuery insertInBD = new DataBaseQuery(mainArray); //отправка для вставки в бд
         //наччало отправки всех данных в БД. Можно сделать потоки для каждого дивизиона для ускорения выгрузки
         /*Document docTournament = Jsoup.connect(urlDiva).get();
@@ -656,6 +657,15 @@ public class ParserSite {
                         case 1:
                             tour = Integer.parseInt(e.text());
                             break;
+                        case 2:
+                            dateMatch = replaceDateMatch(e.text());
+                            break;
+                        case 3:
+                            stadium = e.text().replace("Стадион: ","");
+                            break;
+                        case 4:
+                            referee = e.text().replace("Судья: ","");
+                            break;    
                     }
                 }
                 //инфо о камндах
@@ -664,7 +674,10 @@ public class ParserSite {
                 nameGuest = replaceNameTeam( divLeft.select("div.match_team.match_team_away > p.match_team_name").text() );
                 matchTransfer = div.select("div.match_right > div.match_members").text();
                 System.out.println("\t\t" +division + " " + tour + " " + nameHome + " " + nameGuest + " " + matchTransfer);
-                matches.add(new Match(division, tour, nameHome, nameGuest, matchTransfer));
+                Match m = new Match(division, tour, nameHome, nameGuest, matchTransfer);
+                m.dateMatch = dateMatch;
+                m.stadium = stadium;
+                matches.add(m);
                 numberMatch++; //увеличить счетчик матчей
             }
         

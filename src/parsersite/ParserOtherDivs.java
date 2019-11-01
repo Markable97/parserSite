@@ -40,7 +40,7 @@ public class ParserOtherDivs {
             mainParserDivs(url + i);
         }
         System.out.println(matches.toString());
-        DataBaseQuery baseQuery = new DataBaseQuery(matches);
+        //DataBaseQuery baseQuery = new DataBaseQuery(matches);
         
     }
     
